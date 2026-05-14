@@ -373,34 +373,17 @@ footer {
   .check-row { font-size: 14px; }
   .check-row input[type="checkbox"] { width: 18px; height: 18px; }
 
-  /* Phase cards: scroll orizzontale a scatti */
+  /* Phase cards: stack verticale su mobile */
   .phases-grid,
   .phases-4,
   .phases-5 {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     grid-template-columns: none !important;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
     gap: 10px;
-    padding-bottom: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--gray-200) transparent;
   }
-  .phase-card {
-    min-width: min(300px, 86vw);
-    flex-shrink: 0;
-    scroll-snap-align: start;
-  }
-
-  /* Scroll hint */
-  .scroll-hint {
-    font-size: 11px;
-    color: var(--gray-400);
-    text-align: center;
-    margin-bottom: 6px;
-  }
+  .phase-card { width: 100%; }
+  .scroll-hint { display: none !important; }
 
   /* Netto più grande su mobile */
   .netto-val { font-size: 24px; }
