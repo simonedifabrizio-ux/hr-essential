@@ -1,0 +1,782 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Calculator · eSSENTIAL</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#C0392B">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="HR Calc">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:      #C0392B;
+  --teal-d:    #922B21;
+  --teal-l:    #FDECEA;
+  --teal-xl:   #F4F4F4;
+  --white:     #FFFFFF;
+  --gray-50:   #F9FAFB;
+  --gray-100:  #F3F4F6;
+  --gray-200:  #E5E7EB;
+  --gray-400:  #9CA3AF;
+  --gray-600:  #4B5563;
+  --gray-800:  #1F2937;
+  --red:       #EF4444;
+  --radius:    10px;
+  --shadow:    0 2px 12px rgba(0,0,0,.10);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--teal-xl);
+  color: var(--gray-800);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- HEADER ---- */
+header {
+  background: linear-gradient(135deg, #C0392B 55%, #2C2C2C 100%);
+  color: var(--white);
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+.brand {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: .75;
+  line-height: 1;
+  padding-bottom: 3px;
+}
+.header-title {
+  line-height: 1;
+}
+.header-title h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+.header-title .sub {
+  font-size: 12px;
+  opacity: .75;
+  margin-top: 2px;
+}
+
+/* ---- MAIN ---- */
+main {
+  flex: 1;
+  padding: 24px 16px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--teal);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ---- INPUTS PANEL ---- */
+.inputs-panel {
+  padding: 24px;
+  border-right: 1px solid var(--gray-200);
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--teal);
+  margin-bottom: 12px;
+  margin-top: 20px;
+}
+.section-title:first-child { margin-top: 0; }
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.field.full { grid-template-columns: 1fr; }
+.field label {
+  font-size: 12px;
+  color: var(--gray-600);
+  align-self: center;
+}
+.field select,
+.field input[type="number"] {
+  padding: 6px 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--gray-800);
+  background: var(--gray-50);
+  transition: border-color .15s;
+  width: 100%;
+}
+.field select:focus,
+.field input[type="number"]:focus {
+  outline: none;
+  border-color: var(--teal);
+  background: var(--white);
+}
+
+/* part-time display */
+.pt-display {
+  background: var(--gray-100) !important;
+  color: var(--teal) !important;
+  font-weight: 700;
+  font-size: 13px;
+  border-color: var(--gray-200) !important;
+  cursor: default;
+  text-align: center;
+}
+
+/* familiari toggle */
+.fam-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 4px;
+  user-select: none;
+}
+.fam-toggle .section-title { margin: 0; }
+.fam-toggle .arrow {
+  font-size: 10px;
+  color: var(--teal);
+  transition: transform .2s;
+  margin-top: 1px;
+}
+.fam-toggle.open .arrow { transform: rotate(90deg); }
+#famBlock { display: none; }
+#famBlock.open { display: block; }
+
+/* checkbox row */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.check-row label {
+  font-size: 12px;
+  color: var(--gray-600);
+}
+.check-row input[type="checkbox"] {
+  accent-color: var(--teal);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.fam-note {
+  font-size: 10.5px;
+  color: var(--gray-400);
+  margin-top: 4px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* ---- OUTPUT PANEL ---- */
+.output-panel {
+  padding: 24px;
+  background: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.output-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  text-align: center;
+  gap: 8px;
+  margin: -24px;
+  padding: 40px 24px;
+  background: linear-gradient(150deg, #C0392B 0%, #7B1A1A 100%);
+}
+.output-placeholder .ico { font-size: 32px; opacity: .4; }
+
+.result-block { display: none; }
+.result-block.visible { display: flex; flex-direction: column; gap: 12px; }
+
+.result-primary {
+  background: var(--teal);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-primary .r-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.75);
+}
+.result-primary .r-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -.5px;
+}
+
+.result-secondary {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-secondary .r-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+.result-secondary .r-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-800);
+  letter-spacing: -.3px;
+}
+
+.result-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mensa-note {
+  font-size: 11px;
+  color: var(--gray-600);
+  background: var(--teal-l);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: none;
+}
+.mensa-note.visible { display: block; }
+
+.result-divider {
+  height: 1px;
+  background: var(--gray-200);
+  margin: 4px 0;
+}
+
+.disclaimer {
+  font-size: 10px;
+  color: var(--gray-400);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ---- NOTES BLOCK ---- */
+.notes-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.note-item {
+  font-size: 11.5px;
+  line-height: 1.4;
+  border-radius: 6px;
+  padding: 7px 12px;
+}
+.note-ok  { background: var(--teal-l); color: var(--teal-d); font-weight: 500; }
+.note-no  { background: var(--gray-100); color: var(--gray-400); }
+/* ---- FOOTER ---- */
+footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 10px;
+  color: var(--gray-400);
+  letter-spacing: .5px;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 620px) {
+  .card { grid-template-columns: 1fr; }
+  .inputs-panel { border-right: none; border-bottom: 1px solid var(--gray-200); }
+  .result-pair { grid-template-columns: 1fr; }
+  header { padding: 16px; }
+  main { padding: 16px 10px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">eSSENTIAL</div>
+  <div class="header-title">
+    <h1>HR Calculator</h1>
+    <div class="sub">Lordo &rsaquo; Netto &nbsp;&middot;&nbsp; CCNL Ristorazione 2026</div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+
+    <!-- ===== INPUT PANEL ===== -->
+    <div class="inputs-panel">
+
+      <div class="section-title">Provincia di lavoro</div>
+
+      <div class="field full">
+        <label for="selTerr">Provincia</label>
+        <select id="selTerr">
+          <option value="">— seleziona —</option>
+          <option value="ALESSANDRIA">Alessandria</option>
+          <option value="ANCONA">Ancona</option>
+          <option value="ASCOLI PICENO">Ascoli Piceno</option>
+          <option value="BELLUNO">Belluno</option>
+          <option value="BERGAMO">Bergamo</option>
+          <option value="BOLOGNA">Bologna</option>
+          <option value="BRESCIA">Brescia</option>
+          <option value="CHIETI">Chieti</option>
+          <option value="COMO">Como</option>
+          <option value="CREMONA">Cremona</option>
+          <option value="FERRARA">Ferrara</option>
+          <option value="FIRENZE">Firenze</option>
+          <option value="FOGGIA">Foggia</option>
+          <option value="FORLI">Forli</option>
+          <option value="GENOVA">Genova</option>
+          <option value="LA SPEZIA">La Spezia</option>
+          <option value="MACERATA">Macerata</option>
+          <option value="MANTOVA">Mantova</option>
+          <option value="MILANO">Milano</option>
+          <option value="MODENA">Modena</option>
+          <option value="MONZA BRIANZA">Monza Brianza</option>
+          <option value="NAPOLI">Napoli</option>
+          <option value="NOVARA">Novara</option>
+          <option value="PADOVA">Padova</option>
+          <option value="PARMA">Parma</option>
+          <option value="PESARO">Pesaro</option>
+          <option value="PIACENZA">Piacenza</option>
+          <option value="PORDENONE">Pordenone</option>
+          <option value="POTENZA">Potenza</option>
+          <option value="RAVENNA">Ravenna</option>
+          <option value="REGGIO EMILIA">Reggio Emilia</option>
+          <option value="RIETI">Rieti</option>
+          <option value="ROMA">Roma</option>
+          <option value="ROVIGO">Rovigo</option>
+          <option value="TORINO">Torino</option>
+          <option value="TRENTO">Trento</option>
+          <option value="TREVISO">Treviso</option>
+          <option value="UDINE">Udine</option>
+          <option value="VENEZIA">Venezia</option>
+          <option value="VERONA">Verona</option>
+          <option value="VICENZA">Vicenza</option>
+        </select>
+      </div>
+
+      <div class="section-title">Livello</div>
+
+      <div class="field full">
+        <label for="selLiv">Livello contrattuale</label>
+        <select id="selLiv">
+          <option value="">— seleziona —</option>
+          <option value="1°">1° Livello</option>
+          <option value="2°">2° Livello</option>
+          <option value="3°">3° Livello</option>
+          <option value="4°">4° Livello</option>
+          <option value="5°">5° Livello</option>
+          <option value="6/S">6° Super</option>
+          <option value="6°">6° Livello</option>
+          <option value="7°">7° Livello</option>
+          <option value="quadro A">Quadro A</option>
+          <option value="quadro B">Quadro B</option>
+        </select>
+      </div>
+
+      <div class="section-title">Orario di lavoro</div>
+
+      <div class="field full">
+        <label for="oreScelte">Ore settimanali</label>
+        <select id="oreScelte">
+          <option value="40" selected>40 ore — Full time</option>
+          <option value="38">38 ore</option>
+          <option value="37.5">37,5 ore</option>
+          <option value="35">35 ore</option>
+          <option value="32.5">32,5 ore</option>
+          <option value="30">30 ore</option>
+          <option value="27.5">27,5 ore</option>
+          <option value="25">25 ore</option>
+          <option value="24">24 ore</option>
+          <option value="23.5">23,5 ore</option>
+          <option value="21">21 ore</option>
+          <option value="20">20 ore</option>
+          <option value="17.5">17,5 ore</option>
+          <option value="15">15 ore</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Part-time</label>
+        <input type="text" id="ptPerc" value="100,0%" readonly tabindex="-1" class="pt-display">
+      </div>
+
+      <div class="field">
+        <label for="festiviDom">Festivi domenicali</label>
+        <input type="number" id="festiviDom" value="1" min="0" max="52" step="1">
+      </div>
+
+      <!-- MENSA CHECKBOX -->
+      <div class="check-row" style="margin-top:18px;">
+        <input type="checkbox" id="chkMensa" checked>
+        <label for="chkMensa">Trattenuta mensa inclusa</label>
+      </div>
+
+      <!-- FAMILIARI COLLAPSIBLE -->
+      <div class="fam-toggle" id="famToggle">
+        <div class="section-title">Familiari a carico</div>
+        <span class="arrow">&#9654;</span>
+      </div>
+
+      <div id="famBlock">
+
+        <div class="check-row">
+          <input type="checkbox" id="chkConiuge">
+          <label for="chkConiuge">Coniuge a carico</label>
+        </div>
+
+        <div class="field">
+          <label for="asc100">Ascendenti 100%</label>
+          <input type="number" id="asc100" value="0" min="0" max="5" step="1">
+        </div>
+
+        <div class="field">
+          <label for="asc50">Ascendenti 50%</label>
+          <input type="number" id="asc50" value="0" min="0" max="5" step="1">
+        </div>
+
+        <div class="field">
+          <label for="fig100">Figli 21&#8209;30 anni (100%)</label>
+          <input type="number" id="fig100" value="0" min="0" max="10" step="1">
+        </div>
+
+        <div class="field">
+          <label for="fig50">Figli 21&#8209;30 anni (50%)</label>
+          <input type="number" id="fig50" value="0" min="0" max="10" step="1">
+        </div>
+
+        <div class="fam-note">
+          Figli oltre i 30 anni: verificare applicabilit&agrave; con l&rsquo;amministrazione.<br>
+          Detrazioni art.&nbsp;12 TUIR &mdash; stima su imponibile ordinario.
+        </div>
+
+      </div>
+    </div>
+    <!-- /INPUT PANEL -->
+
+    <!-- ===== OUTPUT PANEL ===== -->
+    <div class="output-panel">
+
+      <div class="output-placeholder" id="placeholder">
+        <svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="50" r="27" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2"/>
+          <text x="100" y="59" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif"
+                font-size="18" font-weight="700" letter-spacing="2" text-anchor="middle"
+                fill="rgba(255,255,255,.8)">FR</text>
+          <text x="100" y="106" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif"
+                font-size="29" font-weight="800" letter-spacing="-0.5" text-anchor="middle"
+                fill="rgba(255,255,255,.65)">felsinea</text>
+        </svg>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.5px">Seleziona provincia e livello</div>
+      </div>
+
+      <div class="result-block" id="resultBlock">
+
+        <div class="result-primary">
+          <div class="r-label">Netto mensile (su 14)</div>
+          <div class="r-value" id="rNettoMensile">&mdash;</div>
+        </div>
+
+        <div class="notes-block" id="notesBlock" style="display:none">
+          <div id="noteDetass" class="note-item"></div>
+          <div id="noteMensa"  class="note-item"></div>
+          <div id="noteFam"    class="note-item"></div>
+        </div>
+
+        <div class="result-secondary">
+          <div class="r-label">Lordo mensile</div>
+          <div class="r-value" id="rLordoMensile">&mdash;</div>
+        </div>
+
+        <div class="result-divider"></div>
+
+        <div class="result-pair">
+          <div class="result-secondary">
+            <div class="r-label">Lordo annuo</div>
+            <div class="r-value" id="rLordoAnnuo">&mdash;</div>
+          </div>
+          <div class="result-secondary">
+            <div class="r-label">Netto annuo</div>
+            <div class="r-value" id="rNettoAnnuo">&mdash;</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <!-- /OUTPUT PANEL -->
+
+  </div>
+</main>
+
+<footer>eSSENTIAL &nbsp;&middot;&nbsp; HR Calculator &nbsp;&middot;&nbsp; uso interno &mdash; aggiornamento CCNL 2026</footer>
+
+<script>
+// ===== DATA =====
+const CCNL = {"ALESSANDRIA|1°": {"tot": 2095.87, "dr": 121.08}, "ALESSANDRIA|2°": {"tot": 1910.92, "dr": 106.73}, "ALESSANDRIA|3°": {"tot": 1799.14, "dr": 98.07}, "ALESSANDRIA|4°": {"tot": 1694.69, "dr": 90.0}, "ALESSANDRIA|5°": {"tot": 1585.86, "dr": 81.52}, "ALESSANDRIA|6/S": {"tot": 1523.2, "dr": 76.62}, "ALESSANDRIA|6°": {"tot": 1500.74, "dr": 74.84}, "ALESSANDRIA|7°": {"tot": 1402.46, "dr": 67.19}, "ANCONA|1°": {"tot": 2060.82, "dr": 121.08}, "ANCONA|2°": {"tot": 1879.12, "dr": 106.73}, "ANCONA|3°": {"tot": 1762.56, "dr": 98.07}, "ANCONA|4°": {"tot": 1658.47, "dr": 90.0}, "ANCONA|5°": {"tot": 1551.33, "dr": 81.52}, "ANCONA|6/S": {"tot": 1488.47, "dr": 76.62}, "ANCONA|6°": {"tot": 1466.01, "dr": 74.84}, "ANCONA|7°": {"tot": 1368.84, "dr": 67.19}, "ASCOLI PICENO|1°": {"tot": 2053.87, "dr": 121.08}, "ASCOLI PICENO|2°": {"tot": 1868.92, "dr": 106.73}, "ASCOLI PICENO|3°": {"tot": 1757.14, "dr": 98.07}, "ASCOLI PICENO|4°": {"tot": 1652.69, "dr": 90.0}, "ASCOLI PICENO|5°": {"tot": 1543.86, "dr": 81.52}, "ASCOLI PICENO|6/S": {"tot": 1480.77, "dr": 76.62}, "ASCOLI PICENO|6°": {"tot": 1458.31, "dr": 74.84}, "ASCOLI PICENO|7°": {"tot": 1360.34, "dr": 67.19}, "BELLUNO|1°": {"tot": 2084.86, "dr": 121.08}, "BELLUNO|2°": {"tot": 1899.91, "dr": 106.73}, "BELLUNO|3°": {"tot": 1788.13, "dr": 98.07}, "BELLUNO|4°": {"tot": 1683.68, "dr": 90.0}, "BELLUNO|5°": {"tot": 1574.85, "dr": 81.52}, "BELLUNO|6/S": {"tot": 1512.19, "dr": 76.62}, "BELLUNO|6°": {"tot": 1489.73, "dr": 74.84}, "BELLUNO|7°": {"tot": 1391.45, "dr": 67.19}, "BERGAMO|1°": {"tot": 2094.15, "dr": 121.08}, "BERGAMO|2°": {"tot": 1911.73, "dr": 106.73}, "BERGAMO|3°": {"tot": 1796.6, "dr": 98.07}, "BERGAMO|4°": {"tot": 1692.15, "dr": 90.0}, "BERGAMO|5°": {"tot": 1584.79, "dr": 81.52}, "BERGAMO|6/S": {"tot": 1523.02, "dr": 76.62}, "BERGAMO|6°": {"tot": 1500.56, "dr": 74.84}, "BERGAMO|7°": {"tot": 1402.78, "dr": 67.19}, "BOLOGNA|1°": {"tot": 2068.47, "dr": 121.08}, "BOLOGNA|2°": {"tot": 1886.94, "dr": 106.73}, "BOLOGNA|3°": {"tot": 1771.11, "dr": 98.07}, "BOLOGNA|4°": {"tot": 1667.11, "dr": 90.0}, "BOLOGNA|5°": {"tot": 1559.97, "dr": 81.52}, "BOLOGNA|6/S": {"tot": 1497.49, "dr": 76.62}, "BOLOGNA|6°": {"tot": 1475.03, "dr": 74.84}, "BOLOGNA|7°": {"tot": 1377.99, "dr": 67.19}, "BOLOGNA|quadro A": {"tot": 2487.57, "dr": 148.0}, "BOLOGNA|quadro B": {"tot": 2296.83, "dr": 133.65}, "BRESCIA|1°": {"tot": 2094.2, "dr": 121.08}, "BRESCIA|2°": {"tot": 1912.5, "dr": 106.73}, "BRESCIA|3°": {"tot": 1796.65, "dr": 98.07}, "BRESCIA|4°": {"tot": 1692.56, "dr": 90.0}, "BRESCIA|5°": {"tot": 1585.42, "dr": 81.52}, "BRESCIA|6/S": {"tot": 1522.89, "dr": 76.62}, "BRESCIA|6°": {"tot": 1500.43, "dr": 74.84}, "BRESCIA|7°": {"tot": 1403.36, "dr": 67.19}, "CHIETI|1°": {"tot": 2053.87, "dr": 121.08}, "CHIETI|2°": {"tot": 1874.44, "dr": 106.73}, "CHIETI|3°": {"tot": 1757.14, "dr": 98.07}, "CHIETI|4°": {"tot": 1652.69, "dr": 90.0}, "CHIETI|5°": {"tot": 1543.86, "dr": 81.52}, "CHIETI|6/S": {"tot": 1486.53, "dr": 76.62}, "CHIETI|6°": {"tot": 1464.07, "dr": 74.84}, "CHIETI|7°": {"tot": 1380.86, "dr": 67.19}, "COMO|1°": {"tot": 2086.92, "dr": 121.08}, "COMO|2°": {"tot": 1901.97, "dr": 106.73}, "COMO|3°": {"tot": 1790.19, "dr": 98.07}, "COMO|4°": {"tot": 1685.74, "dr": 90.0}, "COMO|5°": {"tot": 1576.91, "dr": 81.52}, "COMO|6/S": {"tot": 1517.68, "dr": 76.62}, "COMO|6°": {"tot": 1491.36, "dr": 74.84}, "COMO|7°": {"tot": 1393.39, "dr": 67.19}, "CREMONA|1°": {"tot": 2053.87, "dr": 121.08}, "CREMONA|2°": {"tot": 1868.92, "dr": 106.73}, "CREMONA|3°": {"tot": 1757.14, "dr": 98.07}, "CREMONA|4°": {"tot": 1652.69, "dr": 90.0}, "CREMONA|5°": {"tot": 1543.86, "dr": 81.52}, "CREMONA|6/S": {"tot": 1480.77, "dr": 76.62}, "CREMONA|6°": {"tot": 1458.31, "dr": 74.84}, "CREMONA|7°": {"tot": 1360.34, "dr": 67.19}, "FERRARA|1°": {"tot": 2137.14, "dr": 121.08}, "FERRARA|2°": {"tot": 1944.37, "dr": 106.73}, "FERRARA|3°": {"tot": 1820.83, "dr": 98.07}, "FERRARA|4°": {"tot": 1709.51, "dr": 90.0}, "FERRARA|5°": {"tot": 1596.95, "dr": 81.52}, "FERRARA|6/S": {"tot": 1531.96, "dr": 76.62}, "FERRARA|6°": {"tot": 1509.5, "dr": 74.84}, "FERRARA|7°": {"tot": 1406.8, "dr": 67.19}, "FIRENZE|1°": {"tot": 2096.35, "dr": 121.08}, "FIRENZE|2°": {"tot": 1914.31, "dr": 106.73}, "FIRENZE|3°": {"tot": 1798.56, "dr": 98.07}, "FIRENZE|4°": {"tot": 1694.51, "dr": 90.0}, "FIRENZE|5°": {"tot": 1587.38, "dr": 81.52}, "FIRENZE|6/S": {"tot": 1525.99, "dr": 76.62}, "FIRENZE|6°": {"tot": 1503.53, "dr": 74.84}, "FIRENZE|7°": {"tot": 1406.58, "dr": 67.19}, "FOGGIA|1°": {"tot": 2053.87, "dr": 121.08}, "FOGGIA|2°": {"tot": 1868.92, "dr": 106.73}, "FOGGIA|3°": {"tot": 1757.14, "dr": 98.07}, "FOGGIA|4°": {"tot": 1652.69, "dr": 90.0}, "FOGGIA|5°": {"tot": 1543.86, "dr": 81.52}, "FOGGIA|6/S": {"tot": 1480.77, "dr": 76.62}, "FOGGIA|6°": {"tot": 1458.31, "dr": 74.84}, "FOGGIA|7°": {"tot": 1360.34, "dr": 67.19}, "FORLI|1°": {"tot": 2053.87, "dr": 121.08}, "FORLI|2°": {"tot": 1868.92, "dr": 106.73}, "FORLI|3°": {"tot": 1757.14, "dr": 98.07}, "FORLI|4°": {"tot": 1652.69, "dr": 90.0}, "FORLI|5°": {"tot": 1543.86, "dr": 81.52}, "FORLI|6/S": {"tot": 1480.77, "dr": 76.62}, "FORLI|6°": {"tot": 1458.31, "dr": 74.84}, "FORLI|7°": {"tot": 1360.34, "dr": 67.19}, "GENOVA|1°": {"tot": 2092.09, "dr": 121.08}, "GENOVA|2°": {"tot": 1907.14, "dr": 106.73}, "GENOVA|3°": {"tot": 1795.36, "dr": 98.07}, "GENOVA|4°": {"tot": 1690.91, "dr": 90.0}, "GENOVA|5°": {"tot": 1582.08, "dr": 81.52}, "GENOVA|6/S": {"tot": 1518.99, "dr": 76.62}, "GENOVA|6°": {"tot": 1496.53, "dr": 74.84}, "GENOVA|7°": {"tot": 1398.56, "dr": 67.19}, "LA SPEZIA|1°": {"tot": 2095.18, "dr": 121.08}, "LA SPEZIA|2°": {"tot": 1913.33, "dr": 106.73}, "LA SPEZIA|3°": {"tot": 1801.55, "dr": 98.07}, "LA SPEZIA|4°": {"tot": 1693.85, "dr": 90.0}, "LA SPEZIA|5°": {"tot": 1586.71, "dr": 81.52}, "LA SPEZIA|6/S": {"tot": 1524.28, "dr": 76.62}, "LA SPEZIA|6°": {"tot": 1501.82, "dr": 74.84}, "LA SPEZIA|7°": {"tot": 1404.39, "dr": 67.19}, "MACERATA|1°": {"tot": 2053.87, "dr": 121.08}, "MACERATA|2°": {"tot": 1868.92, "dr": 106.73}, "MACERATA|3°": {"tot": 1757.14, "dr": 98.07}, "MACERATA|4°": {"tot": 1652.69, "dr": 90.0}, "MACERATA|5°": {"tot": 1543.86, "dr": 81.52}, "MACERATA|6/S": {"tot": 1480.77, "dr": 76.62}, "MACERATA|6°": {"tot": 1458.31, "dr": 74.84}, "MACERATA|7°": {"tot": 1360.34, "dr": 67.19}, "MANTOVA|1°": {"tot": 2076.59, "dr": 121.08}, "MANTOVA|2°": {"tot": 1891.64, "dr": 106.73}, "MANTOVA|3°": {"tot": 1779.86, "dr": 98.07}, "MANTOVA|4°": {"tot": 1675.41, "dr": 90.0}, "MANTOVA|5°": {"tot": 1566.58, "dr": 81.52}, "MANTOVA|6/S": {"tot": 1503.49, "dr": 76.62}, "MANTOVA|6°": {"tot": 1481.03, "dr": 74.84}, "MANTOVA|7°": {"tot": 1383.06, "dr": 67.19}, "MILANO|1°": {"tot": 2155.15, "dr": 121.08}, "MILANO|2°": {"tot": 1960.79, "dr": 106.73}, "MILANO|3°": {"tot": 1836.42, "dr": 98.07}, "MILANO|4°": {"tot": 1724.33, "dr": 90.0}, "MILANO|5°": {"tot": 1608.69, "dr": 81.52}, "MILANO|6/S": {"tot": 1543.81, "dr": 76.62}, "MILANO|6°": {"tot": 1521.35, "dr": 74.84}, "MILANO|7°": {"tot": 1420.41, "dr": 67.19}, "MODENA|1°": {"tot": 2115.79, "dr": 121.08}, "MODENA|2°": {"tot": 1927.7, "dr": 106.73}, "MODENA|3°": {"tot": 1810.2, "dr": 98.07}, "MODENA|4°": {"tot": 1702.35, "dr": 90.0}, "MODENA|5°": {"tot": 1592.86, "dr": 81.52}, "MODENA|6/S": {"tot": 1529.1, "dr": 76.62}, "MODENA|6°": {"tot": 1506.64, "dr": 74.84}, "MODENA|7°": {"tot": 1405.84, "dr": 67.19}, "MODENA|quadro A": {"tot": 2538.98, "dr": 148.0}, "MODENA|quadro B": {"tot": 2344.14, "dr": 133.65}, "MONZA BRIANZA|1°": {"tot": 2155.15, "dr": 121.08}, "MONZA BRIANZA|2°": {"tot": 1960.79, "dr": 106.73}, "MONZA BRIANZA|3°": {"tot": 1836.42, "dr": 98.07}, "MONZA BRIANZA|4°": {"tot": 1724.33, "dr": 90.0}, "MONZA BRIANZA|5°": {"tot": 1610.47, "dr": 81.52}, "MONZA BRIANZA|6/S": {"tot": 1543.81, "dr": 76.62}, "MONZA BRIANZA|6°": {"tot": 1521.35, "dr": 74.84}, "MONZA BRIANZA|7°": {"tot": 1420.41, "dr": 67.19}, "NAPOLI|1°": {"tot": 2080.98, "dr": 121.08}, "NAPOLI|2°": {"tot": 1896.03, "dr": 106.73}, "NAPOLI|3°": {"tot": 1784.25, "dr": 98.07}, "NAPOLI|4°": {"tot": 1679.8, "dr": 90.0}, "NAPOLI|5°": {"tot": 1570.97, "dr": 81.52}, "NAPOLI|6/S": {"tot": 1507.88, "dr": 76.62}, "NAPOLI|6°": {"tot": 1485.42, "dr": 74.84}, "NAPOLI|7°": {"tot": 1387.45, "dr": 67.19}, "NOVARA|1°": {"tot": 2066.78, "dr": 121.08}, "NOVARA|2°": {"tot": 1884.89, "dr": 106.73}, "NOVARA|3°": {"tot": 1770.05, "dr": 98.07}, "NOVARA|4°": {"tot": 1665.6, "dr": 90.0}, "NOVARA|5°": {"tot": 1558.24, "dr": 81.52}, "NOVARA|6/S": {"tot": 1496.04, "dr": 76.62}, "NOVARA|6°": {"tot": 1473.58, "dr": 74.84}, "NOVARA|7°": {"tot": 1376.68, "dr": 67.19}, "PADOVA|1°": {"tot": 2054.8, "dr": 121.08}, "PADOVA|2°": {"tot": 1873.64, "dr": 106.73}, "PADOVA|3°": {"tot": 1757.88, "dr": 98.07}, "PADOVA|4°": {"tot": 1654.11, "dr": 90.0}, "PADOVA|5°": {"tot": 1547.99, "dr": 81.52}, "PADOVA|6/S": {"tot": 1486.74, "dr": 76.62}, "PADOVA|6°": {"tot": 1464.28, "dr": 74.84}, "PADOVA|7°": {"tot": 1365.2, "dr": 67.19}, "PARMA|1°": {"tot": 2064.2, "dr": 121.08}, "PARMA|2°": {"tot": 1883.07, "dr": 106.73}, "PARMA|3°": {"tot": 1770.05, "dr": 98.07}, "PARMA|4°": {"tot": 1666.15, "dr": 90.0}, "PARMA|5°": {"tot": 1560.69, "dr": 81.52}, "PARMA|6/S": {"tot": 1500.38, "dr": 76.62}, "PARMA|6°": {"tot": 1477.48, "dr": 74.84}, "PARMA|7°": {"tot": 1380.7, "dr": 67.19}, "PESARO|1°": {"tot": 2082.28, "dr": 121.08}, "PESARO|2°": {"tot": 1894.74, "dr": 106.73}, "PESARO|3°": {"tot": 1780.38, "dr": 98.07}, "PESARO|4°": {"tot": 1673.35, "dr": 90.0}, "PESARO|5°": {"tot": 1561.94, "dr": 81.52}, "PESARO|6/S": {"tot": 1493.68, "dr": 76.62}, "PESARO|6°": {"tot": 1471.22, "dr": 74.84}, "PESARO|7°": {"tot": 1370.67, "dr": 67.19}, "PIACENZA|1°": {"tot": 2053.87, "dr": 121.08}, "PIACENZA|2°": {"tot": 1874.44, "dr": 106.73}, "PIACENZA|3°": {"tot": 1757.14, "dr": 98.07}, "PIACENZA|4°": {"tot": 1652.69, "dr": 90.0}, "PIACENZA|5°": {"tot": 1543.86, "dr": 81.52}, "PIACENZA|6/S": {"tot": 1486.53, "dr": 76.62}, "PIACENZA|6°": {"tot": 1464.07, "dr": 74.84}, "PIACENZA|7°": {"tot": 1380.86, "dr": 67.19}, "PORDENONE|1°": {"tot": 2110.68, "dr": 121.08}, "PORDENONE|2°": {"tot": 1925.73, "dr": 106.73}, "PORDENONE|3°": {"tot": 1813.95, "dr": 98.07}, "PORDENONE|4°": {"tot": 1709.5, "dr": 90.0}, "PORDENONE|5°": {"tot": 1543.86, "dr": 81.52}, "PORDENONE|6/S": {"tot": 1537.58, "dr": 76.62}, "PORDENONE|6°": {"tot": 1515.12, "dr": 74.84}, "PORDENONE|7°": {"tot": 1360.34, "dr": 67.19}, "POTENZA|1°": {"tot": 2053.87, "dr": 121.08}, "POTENZA|2°": {"tot": 1868.92, "dr": 106.73}, "POTENZA|3°": {"tot": 1757.14, "dr": 98.07}, "POTENZA|4°": {"tot": 1652.69, "dr": 90.0}, "POTENZA|5°": {"tot": 1543.86, "dr": 81.52}, "POTENZA|6/S": {"tot": 1480.77, "dr": 76.62}, "POTENZA|6°": {"tot": 1458.31, "dr": 74.84}, "POTENZA|7°": {"tot": 1360.34, "dr": 67.19}, "RAVENNA|1°": {"tot": 2053.87, "dr": 121.08}, "RAVENNA|2°": {"tot": 1870.93, "dr": 106.73}, "RAVENNA|3°": {"tot": 1757.14, "dr": 98.07}, "RAVENNA|4°": {"tot": 1652.69, "dr": 90.0}, "RAVENNA|5°": {"tot": 1544.68, "dr": 81.52}, "RAVENNA|6/S": {"tot": 1482.47, "dr": 76.62}, "RAVENNA|6°": {"tot": 1460.01, "dr": 74.84}, "RAVENNA|7°": {"tot": 1363.19, "dr": 67.19}, "REGGIO EMILIA|1°": {"tot": 2053.87, "dr": 121.08}, "REGGIO EMILIA|2°": {"tot": 1868.92, "dr": 106.73}, "REGGIO EMILIA|3°": {"tot": 1757.14, "dr": 98.07}, "REGGIO EMILIA|4°": {"tot": 1652.69, "dr": 90.0}, "REGGIO EMILIA|5°": {"tot": 1543.86, "dr": 81.52}, "REGGIO EMILIA|6/S": {"tot": 1480.77, "dr": 76.62}, "REGGIO EMILIA|6°": {"tot": 1458.31, "dr": 74.84}, "REGGIO EMILIA|7°": {"tot": 1360.34, "dr": 67.19}, "RIETI|1°": {"tot": 2078.66, "dr": 121.08}, "RIETI|2°": {"tot": 1893.71, "dr": 106.73}, "RIETI|3°": {"tot": 1781.93, "dr": 98.07}, "RIETI|4°": {"tot": 1677.48, "dr": 90.0}, "RIETI|5°": {"tot": 1568.65, "dr": 81.52}, "RIETI|6/S": {"tot": 1505.56, "dr": 76.62}, "RIETI|6°": {"tot": 1483.1, "dr": 74.84}, "RIETI|7°": {"tot": 1385.13, "dr": 67.19}, "ROMA|1°": {"tot": 2097.2, "dr": 121.08}, "ROMA|2°": {"tot": 1915.35, "dr": 106.73}, "ROMA|3°": {"tot": 1799.47, "dr": 98.07}, "ROMA|4°": {"tot": 1695.28, "dr": 90.0}, "ROMA|5°": {"tot": 1588.14, "dr": 81.52}, "ROMA|6/S": {"tot": 1525.57, "dr": 76.62}, "ROMA|6°": {"tot": 1503.11, "dr": 74.84}, "ROMA|7°": {"tot": 1406.0, "dr": 67.19}, "ROVIGO|1°": {"tot": 2053.87, "dr": 121.08}, "ROVIGO|2°": {"tot": 1868.92, "dr": 106.73}, "ROVIGO|3°": {"tot": 1757.14, "dr": 98.07}, "ROVIGO|4°": {"tot": 1652.69, "dr": 90.0}, "ROVIGO|5°": {"tot": 1543.86, "dr": 81.52}, "ROVIGO|6/S": {"tot": 1480.77, "dr": 76.62}, "ROVIGO|6°": {"tot": 1458.31, "dr": 74.84}, "ROVIGO|7°": {"tot": 1360.34, "dr": 67.19}, "TORINO|1°": {"tot": 2147.09, "dr": 121.08}, "TORINO|2°": {"tot": 1964.93, "dr": 106.73}, "TORINO|3°": {"tot": 1855.05, "dr": 98.07}, "TORINO|4°": {"tot": 1737.54, "dr": 90.0}, "TORINO|5°": {"tot": 1630.4, "dr": 81.52}, "TORINO|6/S": {"tot": 1567.59, "dr": 76.62}, "TORINO|6°": {"tot": 1545.13, "dr": 74.84}, "TORINO|7°": {"tot": 1446.63, "dr": 67.19}, "TRENTO|1°": {"tot": 2104.03, "dr": 121.08}, "TRENTO|2°": {"tot": 1919.08, "dr": 106.73}, "TRENTO|3°": {"tot": 1807.3, "dr": 98.07}, "TRENTO|4°": {"tot": 1702.85, "dr": 90.0}, "TRENTO|5°": {"tot": 1594.02, "dr": 81.52}, "TRENTO|6/S": {"tot": 1531.72, "dr": 76.62}, "TRENTO|6°": {"tot": 1509.26, "dr": 74.84}, "TRENTO|7°": {"tot": 1412.49, "dr": 67.19}, "TREVISO|1°": {"tot": 2090.02, "dr": 121.08}, "TREVISO|2°": {"tot": 1905.07, "dr": 106.73}, "TREVISO|3°": {"tot": 1793.29, "dr": 98.07}, "TREVISO|4°": {"tot": 1688.84, "dr": 90.0}, "TREVISO|5°": {"tot": 1580.01, "dr": 81.52}, "TREVISO|6/S": {"tot": 1516.92, "dr": 76.62}, "TREVISO|6°": {"tot": 1494.46, "dr": 74.84}, "TREVISO|7°": {"tot": 1396.49, "dr": 67.19}, "UDINE|1°": {"tot": 2100.35, "dr": 121.08}, "UDINE|2°": {"tot": 1915.4, "dr": 106.73}, "UDINE|3°": {"tot": 1803.62, "dr": 98.07}, "UDINE|4°": {"tot": 1699.17, "dr": 90.0}, "UDINE|5°": {"tot": 1590.34, "dr": 81.52}, "UDINE|6/S": {"tot": 1527.25, "dr": 76.62}, "UDINE|6°": {"tot": 1504.79, "dr": 74.84}, "UDINE|7°": {"tot": 1406.82, "dr": 67.19}, "VENEZIA|1°": {"tot": 2106.4, "dr": 121.08}, "VENEZIA|2°": {"tot": 1922.67, "dr": 106.73}, "VENEZIA|3°": {"tot": 1806.48, "dr": 98.07}, "VENEZIA|4°": {"tot": 1701.16, "dr": 90.0}, "VENEZIA|5°": {"tot": 1594.02, "dr": 81.52}, "VENEZIA|6/S": {"tot": 1530.88, "dr": 76.62}, "VENEZIA|6°": {"tot": 1508.42, "dr": 74.84}, "VENEZIA|7°": {"tot": 1410.88, "dr": 67.19}, "VERONA|1°": {"tot": 2054.79, "dr": 121.08}, "VERONA|2°": {"tot": 1873.64, "dr": 106.73}, "VERONA|3°": {"tot": 1757.88, "dr": 98.07}, "VERONA|4°": {"tot": 1654.11, "dr": 90.0}, "VERONA|5°": {"tot": 1545.36, "dr": 81.52}, "VERONA|6/S": {"tot": 1484.6, "dr": 76.62}, "VERONA|6°": {"tot": 1462.14, "dr": 74.84}, "VERONA|7°": {"tot": 1365.2, "dr": 67.19}, "VICENZA|1°": {"tot": 2072.98, "dr": 121.08}, "VICENZA|2°": {"tot": 1890.04, "dr": 106.73}, "VICENZA|3°": {"tot": 1776.25, "dr": 98.07}, "VICENZA|4°": {"tot": 1671.8, "dr": 90.0}, "VICENZA|5°": {"tot": 1562.97, "dr": 81.52}, "VICENZA|6/S": {"tot": 1503.74, "dr": 76.62}, "VICENZA|6°": {"tot": 1481.28, "dr": 74.84}, "VICENZA|7°": {"tot": 1381.14, "dr": 67.19}};
+const TERR = {"ALESSANDRIA": {"r": "Piemonte", "ec": 0.0, "ac": [0.008, 0.008, 0.011, 0.012]}, "ANCONA": {"r": "Marche", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "ASCOLI PICENO": {"r": "Marche", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "BELLUNO": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "BERGAMO": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "BOLOGNA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "BRESCIA": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "CHIETI": {"r": "Abruzzo", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "COMO": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "CREMONA": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "FERRARA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "FIRENZE": {"r": "Toscana", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "FOGGIA": {"r": "Puglia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "FORLI": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.0055, 0.0055, 0.0078, 0.0079]}, "GENOVA": {"r": "Liguria", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "LA SPEZIA": {"r": "Liguria", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "MACERATA": {"r": "Marche", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "MANTOVA": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "MILANO": {"r": "Lombardia", "ec": 23000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "MODENA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "MONZA BRIANZA": {"r": "Lombardia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "NAPOLI": {"r": "Campania", "ec": 12000.0, "ac": [0.009, 0.009, 0.009, 0.009]}, "NOVARA": {"r": "Piemonte", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "PADOVA": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "PARMA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "PESARO": {"r": "Marche", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "PIACENZA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "PORDENONE": {"r": "Friuli-Venezia Giulia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "POTENZA": {"r": "Basilicata", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "RAVENNA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "REGGIO EMILIA": {"r": "Emilia-Romagna", "ec": 15000.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "RIETI": {"r": "Lazio", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "ROMA": {"r": "Lazio", "ec": 14000.0, "ac": [0.009, 0.009, 0.009, 0.009]}, "ROVIGO": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "TORINO": {"r": "Piemonte", "ec": 11790.0, "ac": [0.0055, 0.008, 0.008, 0.008]}, "TRENTO": {"r": "Trentino-Alto Adige", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "TREVISO": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "UDINE": {"r": "Friuli-Venezia Giulia", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "VENEZIA": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "VERONA": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}, "VICENZA": {"r": "Veneto", "ec": 0.0, "ac": [0.008, 0.008, 0.008, 0.008]}};
+const REG  = {"Abruzzo": [0.0167, 0.0167, 0.0287, 0.0333], "Basilicata": [0.0123, 0.0123, 0.0123, 0.0123], "Campania": [0.0173, 0.0296, 0.032, 0.0333], "Emilia-Romagna": [0.0133, 0.0193, 0.0278, 0.0333], "Friuli-Venezia Giulia": [0.007, 0.0123, 0.0123, 0.0123], "Lazio": [0.0173, 0.0173, 0.0333, 0.0333], "Liguria": [0.0123, 0.0123, 0.0318, 0.0323], "Lombardia": [0.0123, 0.0158, 0.0172, 0.0173], "Marche": [0.0123, 0.0153, 0.017, 0.0173], "Piemonte": [0.0162, 0.0268, 0.0331, 0.0333], "Puglia": [0.0133, 0.0143, 0.0163, 0.0185], "Toscana": [0.0142, 0.0143, 0.0332, 0.0333], "Trentino-Alto Adige": [0.0123, 0.0123, 0.0123, 0.0173], "Veneto": [0.0123, 0.0123, 0.0123, 0.0123]};
+
+// Paga base + contingenza per livello (base enti bilaterali, identica per tutti i territori)
+const BC = {"1°":2053.87,"2°":1868.92,"3°":1757.14,"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31,"7°":1360.34,"quadro A":2397.19,"quadro B":2212.22};
+
+const INPS = 0.097567 + 0.001 + 0.002;   // 0.100567
+
+// ===== UTILS =====
+const fmt = (n) => new Intl.NumberFormat("it-IT", {minimumFractionDigits:2, maximumFractionDigits:2}).format(n) + " €";
+
+// ===== CALC =====
+function calcola(terr, liv, oreW, oreFT, conMensa, festivi, coniuge, asc100, asc50, fig100, fig50) {
+  const key = terr + "|" + liv;
+  const row = CCNL[key];
+  if (!row) return null;
+
+  const prop         = oreW / oreFT;
+  const lM           = row.tot * prop;
+  const lA           = lM * 14;
+  const drA          = row.dr * prop * 14;
+
+  // Festivi domenicali (lordo giornaliero = lM / 26)
+  const festiviAnnui = (lM / 26) * festivi;
+  const lAnnuo       = lA + festiviAnnui;
+
+  // Enti bilaterali azienda (0,20% su paga base+contingenza, confluisce in imponibile fiscale)
+  const entiAziendaA = (BC[liv] || 0) * prop * 14 * 0.002;
+
+  const contributiDip = lAnnuo * INPS;
+  const impFiscLordo  = lAnnuo - contributiDip + entiAziendaA;
+  const impOrd        = impFiscLordo - drA;
+  const impSost5      = drA * (1 - INPS) * 0.05;   // imposta sostitutiva su quota netta INPS
+
+  // IRPEF lorda
+  let irpefL = 0;
+  if (impOrd > 0) {
+    if (impOrd <= 28000)      irpefL = impOrd * 0.23;
+    else if (impOrd <= 50000) irpefL = 28000 * 0.23 + (impOrd - 28000) * 0.33;
+    else                      irpefL = 28000 * 0.23 + 22000 * 0.33 + (impOrd - 50000) * 0.43;
+  }
+
+  // Detrazione lavoro dipendente (art. 13 TUIR 2026)
+  let detrLav = 0;
+  if (impOrd > 0 && impOrd <= 15000) {
+    detrLav = 1955;
+  } else if (impOrd <= 28000) {
+    detrLav = 1910 + 1190 * (28000 - impOrd) / 13000;
+  } else if (impOrd <= 50000) {
+    detrLav = Math.max(0, 1910 * (50000 - impOrd) / 22000);
+  }
+
+  // Maggiorazione detrazione 65€ (25001-35000) e ulteriore detrazione (20001-40000)
+  const magg65  = (impOrd > 25000 && impOrd <= 35000) ? 65 : 0;
+  const ultrDet = impOrd > 20000 && impOrd <= 32000 ? 1000 :
+                  impOrd > 32000 && impOrd <= 40000  ? 1000 * (40000 - impOrd) / 8000 : 0;
+
+  // Test capienza TI (reddito test = impOrd + quota 5% netta, correttivo -75€ su detrLav)
+  const rdTest = impOrd + drA * (1 - INPS);
+  let irpefLT = 0;
+  if (rdTest > 0) {
+    if (rdTest <= 28000)      irpefLT = rdTest * 0.23;
+    else if (rdTest <= 50000) irpefLT = 28000 * 0.23 + (rdTest - 28000) * 0.33;
+    else                      irpefLT = 28000 * 0.23 + 22000 * 0.33 + (rdTest - 50000) * 0.43;
+  }
+  let detrLavT = 0;
+  if (rdTest > 0 && rdTest <= 15000)      detrLavT = 1955;
+  else if (rdTest <= 28000)               detrLavT = 1910 + 1190 * (28000 - rdTest) / 13000;
+  else if (rdTest <= 50000)               detrLavT = Math.max(0, 1910 * (50000 - rdTest) / 22000);
+  const TI = (impOrd > 0 && impOrd <= 15000 && irpefLT > Math.max(0, detrLavT - 75)) ? 1200 : 0;
+
+  // Detrazioni familiari (art. 12 TUIR)
+  const rc = impOrd;
+  let detrCon = 0;
+  if (coniuge) {
+    if (rc <= 15000)      detrCon = 800;
+    else if (rc <= 40000) detrCon = 690;
+    else                  detrCon = Math.max(0, 690 * (80000 - rc) / 40000);
+  }
+  let detrAsc = 0;
+  if (asc100 > 0) detrAsc += asc100 * Math.max(0, 750 * (80000 - rc) / 80000);
+  if (asc50  > 0) detrAsc += asc50  * Math.max(0, 375 * (80000 - rc) / 80000);
+  let detrFig = 0;
+  if (fig100 > 0) detrFig += fig100 * Math.max(0, 950 * (95000 - rc) / 95000);
+  if (fig50  > 0) detrFig += fig50  * Math.max(0, 475 * (95000 - rc) / 95000);
+
+  const detrTot = detrLav + magg65 + ultrDet + detrCon + detrAsc + detrFig;
+  const irpefN  = Math.max(0, irpefL - detrTot);
+
+  // Addizionale regionale
+  const td = TERR[terr];
+  const rr = REG[td.r] || [0, 0, 0, 0];
+  let addReg = 0;
+  if (impOrd > 0) {
+    const s1 = Math.min(impOrd, 15000);
+    const s2 = Math.max(0, Math.min(impOrd, 28000) - 15000);
+    const s3 = Math.max(0, Math.min(impOrd, 50000) - 28000);
+    const s4 = Math.max(0, impOrd - 50000);
+    addReg = s1*rr[0] + s2*rr[1] + s3*rr[2] + s4*rr[3];
+  }
+
+  // Addizionale comunale
+  const ec = td.ec;
+  const ac = td.ac;
+  let addCom = 0;
+  const baseCom = Math.max(0, impOrd - ec);
+  if (baseCom > 0) {
+    const c1 = Math.min(baseCom, Math.max(0, 15000 - ec));
+    const c2 = Math.max(0, Math.min(baseCom, Math.max(0, 28000 - ec)) - Math.max(0, 15000 - ec));
+    const c3 = Math.max(0, Math.min(baseCom, Math.max(0, 50000 - ec)) - Math.max(0, 28000 - ec));
+    const c4 = Math.max(0, baseCom - Math.max(0, 50000 - ec));
+    addCom = c1*ac[0] + c2*ac[1] + c3*ac[2] + c4*ac[3];
+  }
+
+  // Mensa
+  const tarifaMensa = oreW <= 15 ? 1.45 : 1.65;
+  const mensaAnnua  = conMensa ? tarifaMensa * 20 * 11 : 0;
+
+  const nettoA = lAnnuo - contributiDip - irpefN - addReg - addCom - impSost5 + TI - mensaAnnua;
+  const nettoM = nettoA / 14;
+
+  return {
+    lM: lM, lA: lAnnuo,
+    nettoM: nettoM, nettoA: nettoA,
+    mensaAnnua: mensaAnnua,
+    tarifaMensa: tarifaMensa,
+    drA: drA,
+  };
+}
+
+// ===== UI =====
+const ids = ["selTerr","selLiv","oreScelte","festiviDom","chkMensa","chkConiuge",
+             "asc100","asc50","fig100","fig50"];
+
+function aggiorna() {
+  const terr     = document.getElementById("selTerr").value;
+  const liv      = document.getElementById("selLiv").value;
+  const oreW  = parseFloat(document.getElementById("oreScelte").value) || 40;
+  const oreFT = 40;
+  document.getElementById("ptPerc").value = (oreW / oreFT * 100).toFixed(1).replace(".", ",") + "%";
+  const conMensa = document.getElementById("chkMensa").checked;
+  const festivi  = parseInt(document.getElementById("festiviDom").value) || 0;
+  const con    = document.getElementById("chkConiuge").checked;
+  const a100   = parseInt(document.getElementById("asc100").value) || 0;
+  const a50    = parseInt(document.getElementById("asc50").value)  || 0;
+  const f100   = parseInt(document.getElementById("fig100").value) || 0;
+  const f50    = parseInt(document.getElementById("fig50").value)  || 0;
+
+  const ph = document.getElementById("placeholder");
+  const rb = document.getElementById("resultBlock");
+
+  if (!terr || !liv) {
+    ph.style.display = "flex"; rb.classList.remove("visible"); return;
+  }
+
+  const r = calcola(terr, liv, oreW, oreFT, conMensa, festivi, con, a100, a50, f100, f50);
+  if (!r) {
+    ph.style.display = "flex"; rb.classList.remove("visible"); return;
+  }
+
+  ph.style.display = "none";
+  rb.classList.add("visible");
+
+  document.getElementById("rNettoMensile").textContent = fmt(r.nettoM);
+  document.getElementById("rLordoMensile").textContent = fmt(r.lM);
+  document.getElementById("rLordoAnnuo").textContent   = fmt(r.lA);
+  document.getElementById("rNettoAnnuo").textContent   = fmt(r.nettoA);
+
+// ---- NOTE BLOCK ----
+  document.getElementById("notesBlock").style.display = "flex";
+
+  // Detassazione
+  const ndEl = document.getElementById("noteDetass");
+  if (r.drA > 0) {
+    ndEl.className = "note-item note-ok";
+    ndEl.textContent = "✓ Detassazione 5% applicata sul rinnovo CCNL";
+    ndEl.style.display = "block";
+  } else { ndEl.style.display = "none"; }
+
+  // Mensa
+  const nmEl = document.getElementById("noteMensa");
+  const tarifaStr = r.tarifaMensa.toFixed(2).replace(".", ",");
+  const mensaNum = new Intl.NumberFormat("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2}).format(r.mensaAnnua);
+  if (conMensa) {
+    nmEl.className = "note-item note-ok";
+    nmEl.textContent = "✓ Mensa inclusa";
+  } else {
+    nmEl.className = "note-item note-no";
+    nmEl.textContent = "– Mensa non inclusa";
+  }
+  nmEl.style.display = "block";
+
+  // Familiari
+  const nfEl = document.getElementById("noteFam");
+  const famParts = [];
+  if (con)    famParts.push("coniuge");
+  if (a100>0) famParts.push(a100 + (a100===1?" ascendente":" ascendenti") + " 100%");
+  if (a50>0)  famParts.push(a50  + (a50===1 ?" ascendente":" ascendenti") + " 50%");
+  if (f100>0) famParts.push(f100 + (f100===1?" figlio":" figli") + " 100%");
+  if (f50>0)  famParts.push(f50  + (f50===1 ?" figlio":" figli") + " 50%");
+  if (famParts.length > 0) {
+    nfEl.className = "note-item note-ok";
+    nfEl.textContent = "✓ Detrazioni familiari: " + famParts.join(" · ");
+    nfEl.style.display = "block";
+  } else { nfEl.style.display = "none"; }
+}
+
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  const ev = (el.type === "checkbox" || el.tagName === "SELECT") ? "change" : "input";
+  el.addEventListener(ev, aggiorna);
+});
+
+// familiari toggle
+const famToggle = document.getElementById("famToggle");
+const famBlock  = document.getElementById("famBlock");
+famToggle.addEventListener("click", () => {
+  const open = famBlock.classList.toggle("open");
+  famToggle.classList.toggle("open", open);
+});
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+</script>
+</body>
+</html>

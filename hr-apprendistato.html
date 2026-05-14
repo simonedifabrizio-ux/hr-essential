@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#C0392B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HR Essential">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>HR Essential · Apprendistato</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:    #C0392B;
+  --teal-d:  #922B21;
+  --teal-l:  #FDECEA;
+  --teal-xl: #F4F4F4;
+  --white:   #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100:#F3F4F6;
+  --gray-200:#E5E7EB;
+  --gray-400:#9CA3AF;
+  --gray-600:#4B5563;
+  --gray-800:#1F2937;
+  --radius:  10px;
+  --shadow:  0 2px 12px rgba(0,0,0,.10);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--teal-xl);
+  color: var(--gray-800);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: linear-gradient(135deg, #C0392B 55%, #2C2C2C 100%);
+  color: #fff;
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+.brand { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; opacity: .75; padding-bottom: 3px; }
+.header-title h1 { font-size: 22px; font-weight: 700; letter-spacing: -.3px; }
+.header-title .sub { font-size: 12px; opacity: .75; margin-top: 2px; }
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  align-self: center;
+}
+
+main {
+  flex: 1;
+  padding: 20px 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ---- INPUT CARD ---- */
+.input-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--teal);
+  padding: 20px;
+}
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 10px;
+}
+.field { margin-bottom: 13px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 4px; }
+.field select, .field input[type="number"], .field input[type="text"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 7px;
+  font-size: 14px;
+  color: var(--gray-800);
+  background: white;
+  outline: none;
+  transition: border-color .15s;
+}
+.field select:focus, .field input:focus { border-color: var(--teal); }
+.field input[readonly] { background: var(--gray-50); color: var(--gray-400); cursor: default; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Categoria toggle */
+.cat-toggle {
+  display: flex;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 7px;
+  overflow: hidden;
+}
+.cat-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border: none;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all .15s;
+}
+.cat-btn:first-child { border-right: 1px solid var(--gray-200); }
+.cat-btn.active { background: var(--teal-l); color: var(--teal-d); }
+
+/* Checkbox row */
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 8px; }
+.check-row input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--teal); cursor: pointer; }
+.check-row label { cursor: pointer; }
+
+/* Section separator */
+.sep { border: none; border-top: 1px solid var(--gray-200); margin: 14px 0; }
+
+/* Percentuali grid */
+.perc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.perc-field label { font-size: 11px; font-weight: 600; color: var(--gray-600); display: block; margin-bottom: 3px; }
+.perc-field input {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  transition: border-color .15s;
+}
+.perc-field input:focus { border-color: var(--teal); }
+.perc-field input.locked { background: var(--gray-50); color: var(--gray-400); cursor: default; }
+
+/* Familiari collapsible */
+.fam-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.fam-icon { font-size: 9px; color: var(--gray-400); transition: transform .2s; }
+.fam-icon.open { transform: rotate(90deg); }
+.fam-body { display: none; margin-top: 10px; }
+.fam-body.open { display: block; }
+.fam-row { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 12px; }
+.fam-num { width: 48px; padding: 5px 6px; border: 1.5px solid var(--gray-200); border-radius: 6px; font-size: 12px; text-align: center; }
+
+/* ---- RESULTS AREA ---- */
+.results-area { }
+
+.placeholder-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 2px dashed var(--gray-200);
+  padding: 70px 20px;
+  text-align: center;
+  color: var(--gray-400);
+}
+.placeholder-card svg { display: block; margin: 0 auto 16px; opacity: .3; }
+.placeholder-card p { font-size: 15px; }
+
+.result-block { display: none; }
+.result-block.visible { display: block; }
+
+/* Timeline header */
+.tl-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.tl-title { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+.tl-badge {
+  background: var(--teal-l);
+  color: var(--teal-d);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.btn-costs {
+  margin-left: auto;
+  background: var(--gray-100);
+  border: 1.5px solid var(--gray-200);
+  color: var(--gray-600);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-costs.active { background: var(--teal-l); border-color: var(--teal); color: var(--teal-d); }
+
+/* Timeline progress bar */
+.tl-bar {
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 7px;
+  margin-bottom: 14px;
+  gap: 2px;
+}
+.tl-seg { flex: 1; border-radius: 3px; }
+.tl-a1 { background: #F59E0B; }
+.tl-a2 { background: #D97706; }
+.tl-a3 { background: #B45309; }
+.tl-aq { background: #10B981; }
+.tl-an { background: #9CA3AF; }
+
+/* Phase cards grid */
+.phases-grid {
+  display: grid;
+  gap: 10px;
+}
+.phases-4 { grid-template-columns: repeat(4, 1fr); }
+.phases-5 { grid-template-columns: repeat(5, 1fr); }
+
+.phase-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Phase header colors */
+.ph-a1 .ph-head { background: #F59E0B; }
+.ph-a2 .ph-head { background: #D97706; }
+.ph-a3 .ph-head { background: #B45309; }
+.ph-aq .ph-head { background: #059669; }
+.ph-an .ph-head { background: #374151; }
+
+.ph-head {
+  padding: 10px 12px;
+  color: white;
+}
+.ph-name { font-size: 13px; font-weight: 700; }
+.ph-sub  { font-size: 10px; opacity: .85; margin-top: 2px; line-height: 1.3; }
+
+.ph-body { padding: 12px; }
+
+.netto-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray-400); }
+.netto-val { font-size: 20px; font-weight: 800; color: var(--teal); margin-top: 2px; margin-bottom: 10px; line-height: 1; }
+
+.dr { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #059669; font-weight: 600; margin-bottom: 4px; }
+.form-info { font-size: 10px; color: #6B7280; margin-top: 2px; margin-bottom: 6px; }
+
+.row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+.row-lbl { font-size: 11px; color: var(--gray-600); }
+.row-val { font-size: 11px; font-weight: 700; color: var(--gray-800); }
+
+.divider { border: none; border-top: 1px solid var(--gray-200); margin: 8px 0; }
+
+/* Cost section */
+.cost-sec { display: none; }
+.cost-sec.on { display: block; }
+.cost-total {
+  background: var(--gray-50);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+.cost-total-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-600); }
+.cost-total-val { font-size: 15px; font-weight: 800; color: var(--gray-800); margin-top: 2px; }
+.cost-total-sub { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+.cost-note { font-size: 9px; color: var(--gray-400); margin-top: 4px; font-style: italic; }
+
+/* Summary bar */
+.summary-bar {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+.phases-4 ~ .summary-bar { grid-template-columns: repeat(4, 1fr); }
+.phases-5 ~ .summary-bar { grid-template-columns: repeat(5, 1fr); }
+.summ-card {
+  background: white;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.summ-lbl { font-size: 10px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.summ-val { font-size: 14px; font-weight: 800; color: var(--gray-800); margin-top: 3px; }
+
+footer {
+  text-align: center;
+  padding: 12px;
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+/* ── TABLET ────────────────────────────────────────────────────────── */
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 1fr; }
+  .phases-4 { grid-template-columns: repeat(2, 1fr); }
+  .phases-5 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── MOBILE ────────────────────────────────────────────────────────── */
+.mob-toggle { display: none; }
+
+@media (max-width: 680px) {
+
+  /* Header compatto */
+  header { padding: 14px 16px env(safe-area-inset-top, 0px) 16px; }
+  .header-title h1 { font-size: 19px; }
+  .header-title .sub { font-size: 10px; }
+  .header-badge { display: none; }
+
+  main { padding: 10px 10px; }
+
+  /* Pulsante collassa/espandi input */
+  .mob-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 10px;
+    letter-spacing: .3px;
+  }
+  .mob-toggle-icon { font-size: 10px; transition: transform .2s; }
+  .mob-toggle-icon.open { transform: rotate(180deg); }
+
+  /* Input card: collassabile su mobile */
+  .input-card { display: none; margin-bottom: 10px; }
+  .input-card.mob-open { display: block; }
+
+  /* Inputs touch-friendly — 16px previene auto-zoom iOS */
+  .field select,
+  .field input[type="number"],
+  .field input[type="text"] {
+    padding: 10px 12px;
+    font-size: 16px;
+    min-height: 46px;
+  }
+  .cat-btn { padding: 11px 4px; font-size: 14px; min-height: 46px; }
+  .perc-field input { padding: 10px 8px; font-size: 16px; min-height: 44px; }
+  .fam-num { font-size: 16px; min-height: 40px; width: 56px; }
+  .check-row { font-size: 14px; }
+  .check-row input[type="checkbox"] { width: 18px; height: 18px; }
+
+  /* Phase cards: scroll orizzontale a scatti */
+  .phases-grid,
+  .phases-4,
+  .phases-5 {
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 10px;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-200) transparent;
+  }
+  .phase-card {
+    min-width: min(300px, 86vw);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
+  /* Scroll hint */
+  .scroll-hint {
+    font-size: 11px;
+    color: var(--gray-400);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  /* Netto più grande su mobile */
+  .netto-val { font-size: 24px; }
+  .row-lbl, .row-val { font-size: 12px; }
+
+  /* Bottone costi full width */
+  .tl-header { flex-wrap: wrap; row-gap: 6px; }
+  .btn-costs { width: 100%; margin-left: 0; padding: 10px; font-size: 12px; }
+
+  footer { padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="brand">HR ESSENTIAL</div>
+    <div class="header-title">
+      <h1>HR Essential</h1>
+      <div class="sub">CCNL Turismo · Pubblici Esercizi · Ristorazione — Apprendistato Professionalizzante</div>
+    </div>
+  </div>
+  <div class="header-badge">D.Lgs. 81/2015</div>
+</header>
+
+<main>
+  <div class="layout">
+
+    <!-- Pulsante collassa/espandi (solo mobile) -->
+    <button class="mob-toggle" id="mobToggle" onclick="toggleMobInput()">
+      <span>▶ Parametri contratto</span>
+      <span class="mob-toggle-icon" id="mobIcon">▼</span>
+    </button>
+
+    <!-- ========== INPUT PANEL ========== -->
+    <div class="input-card" id="inputCard">
+      <p class="section-title">Parametri contratto</p>
+
+      <div class="field">
+        <label>Provincia</label>
+        <select id="selTerr" onchange="aggiorna()">
+          <option value="">— seleziona —</option>
+          <option>ALESSANDRIA</option><option>ANCONA</option><option>ASCOLI PICENO</option>
+          <option>BELLUNO</option><option>BERGAMO</option><option>BOLOGNA</option>
+          <option>BRESCIA</option><option>CHIETI</option><option>COMO</option>
+          <option>CREMONA</option><option>FERRARA</option><option>FIRENZE</option>
+          <option>FOGGIA</option><option>FORLI</option><option>GENOVA</option>
+          <option>LA SPEZIA</option><option>MACERATA</option><option>MANTOVA</option>
+          <option>MILANO</option><option>MODENA</option><option>MONZA BRIANZA</option>
+          <option>NAPOLI</option><option>NOVARA</option><option>PADOVA</option>
+          <option>PARMA</option><option>PESARO</option><option>PIACENZA</option>
+          <option>PORDENONE</option><option>POTENZA</option><option>RAVENNA</option>
+          <option>REGGIO EMILIA</option><option>RIETI</option><option>ROMA</option>
+          <option>ROVIGO</option><option>TORINO</option><option>TRENTO</option>
+          <option>TREVISO</option><option>UDINE</option><option>VENEZIA</option>
+          <option>VERONA</option><option>VICENZA</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Categoria</label>
+        <div class="cat-toggle" id="catToggle">
+          <button class="cat-btn active" data-val="operaio">Operaio</button>
+          <button class="cat-btn" data-val="impiegato">Impiegato</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Livello finale di inquadramento</label>
+        <select id="selLiv" onchange="onLivChange()">
+          <option value="">— seleziona —</option>
+          <option value="4°">4° Livello — 36 mesi</option>
+          <option value="5°">5° Livello — 36 mesi</option>
+          <option value="6/S">6° Super — 36 mesi</option>
+          <option value="6°">6° Livello — 24 mesi</option>
+        </select>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label>Ore settimanali</label>
+          <input type="number" id="oreScelte" value="40" min="1" max="40" onchange="aggiorna()">
+        </div>
+        <div class="field">
+          <label>Part-time</label>
+          <input type="text" id="ptPerc" readonly value="100,0%">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Superminimo (€/mese)</label>
+        <input type="number" id="superminimo" value="0" min="0" step="5" onchange="aggiorna()" placeholder="0">
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="chkMensa" checked onchange="aggiorna()">
+        <label for="chkMensa">Trattenuta mensa inclusa</label>
+      </div>
+
+      <hr class="sep">
+      <p class="section-title">Percentuali per anno <span style="color:var(--teal);font-size:9px;text-transform:none;letter-spacing:0">(modificabili per condizione di miglior favore)</span></p>
+
+      <div class="perc-grid">
+        <div class="perc-field">
+          <label>Anno 1 (%)</label>
+          <input type="number" id="perc1" value="80" min="0" max="200" onchange="aggiorna()">
+        </div>
+        <div class="perc-field">
+          <label>Anno 2 (%)</label>
+          <input type="number" id="perc2" value="85" min="0" max="200" onchange="aggiorna()">
+        </div>
+        <div class="perc-field" id="fieldA3">
+          <label>Anno 3 (%)</label>
+          <input type="number" id="perc3" value="90" min="0" max="200" onchange="aggiorna()">
+        </div>
+        <div class="perc-field">
+          <label>Qualifica (%)</label>
+          <input type="number" id="percQ" value="100" class="locked" readonly>
+        </div>
+      </div>
+
+      <hr class="sep">
+      <div class="fam-header" onclick="toggleFam()">
+        <span class="fam-icon" id="famIcon">▶</span>
+        <p class="section-title" style="margin:0">Familiari a carico</p>
+      </div>
+      <div class="fam-body" id="famBody">
+        <div class="check-row" style="margin-top:8px">
+          <input type="checkbox" id="chkConiuge" onchange="aggiorna()">
+          <label for="chkConiuge">Coniuge a carico</label>
+        </div>
+        <div class="fam-row">
+          <label>Ascendenti 100%</label>
+          <input type="number" class="fam-num" id="asc100" value="0" min="0" max="10" onchange="aggiorna()">
+        </div>
+        <div class="fam-row">
+          <label>Ascendenti 50%</label>
+          <input type="number" class="fam-num" id="asc50" value="0" min="0" max="10" onchange="aggiorna()">
+        </div>
+        <div class="fam-row">
+          <label>Figli 21-30 100%</label>
+          <input type="number" class="fam-num" id="fig100" value="0" min="0" max="10" onchange="aggiorna()">
+        </div>
+        <div class="fam-row">
+          <label>Figli 21-30 50%</label>
+          <input type="number" class="fam-num" id="fig50" value="0" min="0" max="10" onchange="aggiorna()">
+        </div>
+      </div>
+
+      <!-- Parametro INPS az normale — visibile solo con costi attivi -->
+      <div id="inpsNormField" style="display:none">
+        <hr class="sep">
+        <p class="section-title">Parametro costo azienda</p>
+        <div class="perc-field">
+          <label>INPS az. contratto normale (%)</label>
+          <input type="number" id="inpsAzNorm" value="29.50" min="0" max="50" step="0.01" onchange="aggiorna()">
+        </div>
+      </div>
+
+    </div><!-- end input-card -->
+
+    <!-- ========== RESULTS AREA ========== -->
+    <div class="results-area">
+
+      <div class="placeholder-card" id="placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          <path d="M9 12h6M9 16h4"/>
+        </svg>
+        <p>Seleziona provincia e livello per visualizzare<br>la progressione retributiva dell'apprendistato</p>
+      </div>
+
+      <div class="result-block" id="resultBlock">
+        <div class="tl-header">
+          <span class="tl-title" id="tlTitle">Progressione apprendistato</span>
+          <span class="tl-badge" id="tlBadge"></span>
+          <button class="btn-costs" id="btnCosts" onclick="toggleCosts()">📊 Mostra costo azienda</button>
+        </div>
+        <div class="tl-bar" id="tlBar"></div>
+        <div class="scroll-hint" id="scrollHint" style="display:none">← scorri per vedere tutte le fasi →</div>
+        <div class="phases-grid" id="phasesGrid"></div>
+      </div>
+
+    </div><!-- end results-area -->
+
+  </div><!-- end layout -->
+</main>
+
+<footer>HR Essential &nbsp;·&nbsp; Apprendistato &nbsp;·&nbsp; uso interno &mdash; CCNL Turismo-Ristorazione FIPE 2024-2027 · D.Lgs. 81/2015</footer>
+
+<script>
+// ===== DATI CCNL (tot mensile per provincia e livello) =====
+const CCNL = {
+  "ALESSANDRIA":  {"4°":1694.69,"5°":1585.86,"6/S":1523.20,"6°":1500.74},
+  "ANCONA":       {"4°":1658.47,"5°":1551.33,"6/S":1488.47,"6°":1466.01},
+  "ASCOLI PICENO":{"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "BELLUNO":      {"4°":1683.68,"5°":1574.85,"6/S":1512.19,"6°":1489.73},
+  "BERGAMO":      {"4°":1692.15,"5°":1584.79,"6/S":1523.02,"6°":1500.56},
+  "BOLOGNA":      {"4°":1667.11,"5°":1559.97,"6/S":1497.49,"6°":1475.03},
+  "BRESCIA":      {"4°":1692.56,"5°":1585.42,"6/S":1522.89,"6°":1500.43},
+  "CHIETI":       {"4°":1652.69,"5°":1543.86,"6/S":1486.53,"6°":1464.07},
+  "COMO":         {"4°":1685.74,"5°":1576.91,"6/S":1517.68,"6°":1491.36},
+  "CREMONA":      {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "FERRARA":      {"4°":1709.51,"5°":1596.95,"6/S":1531.96,"6°":1509.50},
+  "FIRENZE":      {"4°":1694.51,"5°":1587.38,"6/S":1525.99,"6°":1503.53},
+  "FOGGIA":       {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "FORLI":        {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "GENOVA":       {"4°":1690.91,"5°":1582.08,"6/S":1518.99,"6°":1496.53},
+  "LA SPEZIA":    {"4°":1693.85,"5°":1586.71,"6/S":1524.28,"6°":1501.82},
+  "MACERATA":     {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "MANTOVA":      {"4°":1675.41,"5°":1566.58,"6/S":1503.49,"6°":1481.03},
+  "MILANO":       {"4°":1724.33,"5°":1608.69,"6/S":1543.81,"6°":1521.35},
+  "MODENA":       {"4°":1702.35,"5°":1592.86,"6/S":1529.10,"6°":1506.64},
+  "MONZA BRIANZA":{"4°":1724.33,"5°":1610.47,"6/S":1543.81,"6°":1521.35},
+  "NAPOLI":       {"4°":1679.80,"5°":1570.97,"6/S":1507.88,"6°":1485.42},
+  "NOVARA":       {"4°":1665.60,"5°":1558.24,"6/S":1496.04,"6°":1473.58},
+  "PADOVA":       {"4°":1654.11,"5°":1547.99,"6/S":1486.74,"6°":1464.28},
+  "PARMA":        {"4°":1666.15,"5°":1560.69,"6/S":1500.38,"6°":1477.48},
+  "PESARO":       {"4°":1673.35,"5°":1561.94,"6/S":1493.68,"6°":1471.22},
+  "PIACENZA":     {"4°":1652.69,"5°":1543.86,"6/S":1486.53,"6°":1464.07},
+  "PORDENONE":    {"4°":1709.50,"5°":1543.86,"6/S":1537.58,"6°":1515.12},
+  "POTENZA":      {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "RAVENNA":      {"4°":1652.69,"5°":1544.68,"6/S":1482.47,"6°":1460.01},
+  "REGGIO EMILIA":{"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "RIETI":        {"4°":1677.48,"5°":1568.65,"6/S":1505.56,"6°":1483.10},
+  "ROMA":         {"4°":1695.28,"5°":1588.14,"6/S":1525.57,"6°":1503.11},
+  "ROVIGO":       {"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31},
+  "TORINO":       {"4°":1737.54,"5°":1630.40,"6/S":1567.59,"6°":1545.13},
+  "TRENTO":       {"4°":1702.85,"5°":1594.02,"6/S":1531.72,"6°":1509.26},
+  "TREVISO":      {"4°":1688.84,"5°":1580.01,"6/S":1516.92,"6°":1494.46},
+  "UDINE":        {"4°":1699.17,"5°":1590.34,"6/S":1527.25,"6°":1504.79},
+  "VENEZIA":      {"4°":1701.16,"5°":1594.02,"6/S":1530.88,"6°":1508.42},
+  "VERONA":       {"4°":1654.11,"5°":1545.36,"6/S":1484.60,"6°":1462.14},
+  "VICENZA":      {"4°":1671.80,"5°":1562.97,"6/S":1503.74,"6°":1481.28}
+};
+
+// Delta rinnovo (uniforme per livello, base detassazione 5%)
+const DR = {"4°":90.0, "5°":81.52, "6/S":76.62, "6°":74.84};
+
+// Paga base + contingenza (base calcolo enti bilaterali az.)
+const BC = {"4°":1652.69, "5°":1543.86, "6/S":1480.77, "6°":1458.31};
+
+// Dati territoriali: regione, esenzione comunale, aliquote comunali per scaglione
+const TERR = {
+  "ALESSANDRIA":  {"r":"Piemonte",             "ec":0,     "ac":[.008,.008,.011,.012]},
+  "ANCONA":       {"r":"Marche",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "ASCOLI PICENO":{"r":"Marche",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "BELLUNO":      {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "BERGAMO":      {"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "BOLOGNA":      {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "BRESCIA":      {"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "CHIETI":       {"r":"Abruzzo",              "ec":0,     "ac":[.008,.008,.008,.008]},
+  "COMO":         {"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "CREMONA":      {"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "FERRARA":      {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "FIRENZE":      {"r":"Toscana",              "ec":0,     "ac":[.008,.008,.008,.008]},
+  "FOGGIA":       {"r":"Puglia",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "FORLI":        {"r":"Emilia-Romagna",       "ec":15000, "ac":[.0055,.0055,.0078,.0079]},
+  "GENOVA":       {"r":"Liguria",              "ec":0,     "ac":[.008,.008,.008,.008]},
+  "LA SPEZIA":    {"r":"Liguria",              "ec":0,     "ac":[.008,.008,.008,.008]},
+  "MACERATA":     {"r":"Marche",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "MANTOVA":      {"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "MILANO":       {"r":"Lombardia",            "ec":23000, "ac":[.008,.008,.008,.008]},
+  "MODENA":       {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "MONZA BRIANZA":{"r":"Lombardia",            "ec":0,     "ac":[.008,.008,.008,.008]},
+  "NAPOLI":       {"r":"Campania",             "ec":12000, "ac":[.009,.009,.009,.009]},
+  "NOVARA":       {"r":"Piemonte",             "ec":0,     "ac":[.008,.008,.008,.008]},
+  "PADOVA":       {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "PARMA":        {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "PESARO":       {"r":"Marche",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "PIACENZA":     {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "PORDENONE":    {"r":"Friuli-Venezia Giulia","ec":0,     "ac":[.008,.008,.008,.008]},
+  "POTENZA":      {"r":"Basilicata",           "ec":0,     "ac":[.008,.008,.008,.008]},
+  "RAVENNA":      {"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "REGGIO EMILIA":{"r":"Emilia-Romagna",       "ec":15000, "ac":[.008,.008,.008,.008]},
+  "RIETI":        {"r":"Lazio",                "ec":0,     "ac":[.008,.008,.008,.008]},
+  "ROMA":         {"r":"Lazio",                "ec":14000, "ac":[.009,.009,.009,.009]},
+  "ROVIGO":       {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "TORINO":       {"r":"Piemonte",             "ec":11790, "ac":[.0055,.008,.008,.008]},
+  "TRENTO":       {"r":"Trentino-Alto Adige",  "ec":0,     "ac":[.008,.008,.008,.008]},
+  "TREVISO":      {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "UDINE":        {"r":"Friuli-Venezia Giulia","ec":0,     "ac":[.008,.008,.008,.008]},
+  "VENEZIA":      {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "VERONA":       {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]},
+  "VICENZA":      {"r":"Veneto",               "ec":0,     "ac":[.008,.008,.008,.008]}
+};
+
+// Aliquote addizionale regionale per scaglione IRPEF
+const REG = {
+  "Abruzzo":              [.0167,.0167,.0287,.0333],
+  "Basilicata":           [.0123,.0123,.0123,.0123],
+  "Campania":             [.0173,.0296,.0320,.0333],
+  "Emilia-Romagna":       [.0133,.0193,.0278,.0333],
+  "Friuli-Venezia Giulia":[.0070,.0123,.0123,.0123],
+  "Lazio":                [.0173,.0173,.0333,.0333],
+  "Liguria":              [.0123,.0123,.0318,.0323],
+  "Lombardia":            [.0123,.0158,.0172,.0173],
+  "Marche":               [.0123,.0153,.0170,.0173],
+  "Piemonte":             [.0162,.0268,.0331,.0333],
+  "Puglia":               [.0133,.0143,.0163,.0185],
+  "Toscana":              [.0142,.0143,.0332,.0333],
+  "Trentino-Alto Adige":  [.0123,.0123,.0123,.0173],
+  "Veneto":               [.0123,.0123,.0123,.0123]
+};
+
+// ===== COSTANTI CONTRIBUTIVE =====
+// Dipendente apprendista: IVS 5.84% + 0.30% + 0.2667% + COVELCO 0.10% + EB 0.20%
+const INPS_APPR = 0.0584 + 0.003 + 0.002667 + 0.001 + 0.002; // 0.066967
+// Dipendente ordinario
+const INPS_NORM = 0.097567 + 0.001 + 0.002;                  // 0.100567
+// Datore apprendista
+const INPS_AZ_APPR = 0.124633;
+// INAIL: tasso base × 1.01 (maggiorazione 1%)
+const INAIL_OP = 0.0109 * 1.01;  // operai:    11.009‰ = 0.011009
+const INAIL_IM = 0.0062 * 1.01;  // impiegati:  6.262‰ = 0.006262
+
+// ===== STATO UI =====
+let costsVisible = false;
+
+// ===== UTILS =====
+const fmt = n => new Intl.NumberFormat("it-IT",{minimumFractionDigits:2,maximumFractionDigits:2}).format(n) + " €";
+const pct = n => (n*100).toFixed(0) + "%";
+
+// ===== CALCOLO SINGOLA FASE =====
+function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, coniuge, a100, a50, f100, f50) {
+  const tot = CCNL[terr][liv];
+  const dr  = DR[liv];
+  const bc  = BC[liv];
+
+  // Lordo mensile e annuo (14 mensilità)
+  const lMtab  = tot * prop * perc;          // tabellare apprendista
+  const supMeff = supM * prop;               // superminimo pro-rata PT
+  const lM     = lMtab + supMeff;
+  const lA     = lM * 14;
+
+  // Delta rinnovo (proporzionale alla % apprendistato, non al superminimo)
+  const drA = dr * prop * perc * 14;
+
+  // Enti bilaterali + COVELCO azienda (su BC nazionale, benefit per dipendente)
+  // EB principale 0.40% AZ + COVELCO 0.10% AZ = 0.50% totale
+  const entiAzA = bc * prop * 14 * 0.005;
+
+  const INPSdip     = isAppr ? INPS_APPR : INPS_NORM;
+  const contributiDip = lA * INPSdip;
+
+  // Imponibile fiscale
+  const impFiscLordo = lA - contributiDip + entiAzA;
+  const impOrd       = impFiscLordo - drA;
+  const impSost5     = drA * (1 - INPSdip) * 0.05;  // 5% su quota netta INPS
+
+  // IRPEF lorda 2026
+  let irpefL = 0;
+  if (impOrd > 0) {
+    if      (impOrd <= 28000) irpefL = impOrd * 0.23;
+    else if (impOrd <= 50000) irpefL = 28000*.23 + (impOrd-28000)*.33;
+    else                      irpefL = 28000*.23 + 22000*.33 + (impOrd-50000)*.43;
+  }
+
+  // Detrazione lavoro dipendente art. 13 TUIR 2026
+  let detrLav = 0;
+  if      (impOrd > 0 && impOrd <= 15000) detrLav = 1955;
+  else if (impOrd <= 28000) detrLav = 1910 + 1190*(28000-impOrd)/13000;
+  else if (impOrd <= 50000) detrLav = Math.max(0, 1910*(50000-impOrd)/22000);
+
+  const magg65  = (impOrd > 25000 && impOrd <= 35000) ? 65 : 0;
+  const ultrDet = impOrd > 20000 && impOrd <= 32000 ? 1000 :
+                  impOrd > 32000 && impOrd <= 40000  ? 1000*(40000-impOrd)/8000 : 0;
+
+  // Test capienza Trattamento Integrativo
+  const rdTest = impOrd + drA*(1-INPSdip);
+  let irpefLT = 0, detrLavT = 0;
+  if (rdTest > 0) {
+    if      (rdTest <= 28000) irpefLT = rdTest*.23;
+    else if (rdTest <= 50000) irpefLT = 28000*.23 + (rdTest-28000)*.33;
+    else                      irpefLT = 28000*.23 + 22000*.33 + (rdTest-50000)*.43;
+    if      (rdTest <= 15000) detrLavT = 1955;
+    else if (rdTest <= 28000) detrLavT = 1910 + 1190*(28000-rdTest)/13000;
+    else if (rdTest <= 50000) detrLavT = Math.max(0, 1910*(50000-rdTest)/22000);
+  }
+  const TI = (impOrd > 0 && impOrd <= 15000 && irpefLT > Math.max(0, detrLavT-75)) ? 1200 : 0;
+
+  // Detrazioni familiari art. 12 TUIR
+  const rc = impOrd;
+  let detrCon = 0;
+  if (coniuge) {
+    if      (rc <= 15000) detrCon = 800;
+    else if (rc <= 40000) detrCon = 690;
+    else                  detrCon = Math.max(0, 690*(80000-rc)/40000);
+  }
+  let detrAsc = 0;
+  if (a100>0) detrAsc += a100 * Math.max(0, 750*(80000-rc)/80000);
+  if (a50 >0) detrAsc += a50  * Math.max(0, 375*(80000-rc)/80000);
+  let detrFig = 0;
+  if (f100>0) detrFig += f100 * Math.max(0, 950*(95000-rc)/95000);
+  if (f50 >0) detrFig += f50  * Math.max(0, 475*(95000-rc)/95000);
+
+  const detrTot = detrLav + magg65 + ultrDet + detrCon + detrAsc + detrFig;
+  const irpefN  = Math.max(0, irpefL - detrTot);
+
+  // Addizionale regionale
+  const td = TERR[terr];
+  const rr = REG[td.r] || [0,0,0,0];
+  let addReg = 0;
+  if (impOrd > 0) {
+    const s1 = Math.min(impOrd, 15000);
+    const s2 = Math.max(0, Math.min(impOrd,28000)-15000);
+    const s3 = Math.max(0, Math.min(impOrd,50000)-28000);
+    const s4 = Math.max(0, impOrd-50000);
+    addReg = s1*rr[0] + s2*rr[1] + s3*rr[2] + s4*rr[3];
+  }
+
+  // Addizionale comunale
+  const ec = td.ec, ac = td.ac;
+  let addCom = 0;
+  const baseCom = Math.max(0, impOrd-ec);
+  if (baseCom > 0) {
+    const c1 = Math.min(baseCom, Math.max(0,15000-ec));
+    const c2 = Math.max(0, Math.min(baseCom,Math.max(0,28000-ec)) - Math.max(0,15000-ec));
+    const c3 = Math.max(0, Math.min(baseCom,Math.max(0,50000-ec)) - Math.max(0,28000-ec));
+    const c4 = Math.max(0, baseCom-Math.max(0,50000-ec));
+    addCom = c1*ac[0] + c2*ac[1] + c3*ac[2] + c4*ac[3];
+  }
+
+  // Mensa
+  const tarifaMensa = oreW <= 15 ? 1.45 : 1.65;
+  const mensaAnnua  = conMensa ? tarifaMensa*20*11 : 0;
+
+  const nettoA = lA - contributiDip - irpefN - addReg - addCom - impSost5 + TI - mensaAnnua;
+  const nettoM = nettoA / 14;
+
+  // Costo azienda
+  const inpsAzRate = isAppr ? INPS_AZ_APPR : (parseFloat(document.getElementById('inpsAzNorm').value)||29.5)/100;
+  const inailRate  = categ === 'operaio' ? INAIL_OP : INAIL_IM;
+  const inpsAz  = lA * inpsAzRate;
+  const inailAz = lA * inailRate;
+  const tfr     = lA / 13.5;
+  const fondoEstAz = 12 * 12;  // Fondo EST: 12 €/mese × 12 mesi, quota AZ
+  const costoAz = lA + inpsAz + inailAz + tfr + entiAzA + fondoEstAz;
+
+  return { lM, lA, nettoM, nettoA, drA, impOrd, contributiDip,
+           irpefN, addReg, addCom, impSost5, TI, entiAzA, fondoEstAz,
+           inpsAz, inailAz, tfr, costoAz, mensaAnnua, tarifaMensa, isAppr };
+}
+
+// ===== CAMBIO LIVELLO =====
+function onLivChange() {
+  const liv = document.getElementById('selLiv').value;
+  const is36 = liv !== '6°';
+  document.getElementById('fieldA3').style.display = is36 ? '' : 'none';
+  aggiorna();
+}
+
+// ===== AGGIORNA =====
+function aggiorna() {
+  const terr = document.getElementById('selTerr').value;
+  const liv  = document.getElementById('selLiv').value;
+
+  const oreW = parseFloat(document.getElementById('oreScelte').value) || 40;
+  const prop = oreW / 40;
+  document.getElementById('ptPerc').value = (prop*100).toFixed(1).replace('.',',') + '%';
+
+  if (!terr || !liv) { showPH(); return; }
+  if (!CCNL[terr] || !CCNL[terr][liv]) { showPH(); return; }
+
+  const supM    = parseFloat(document.getElementById('superminimo').value) || 0;
+  const conMensa = document.getElementById('chkMensa').checked;
+  const categ   = document.querySelector('.cat-btn.active').dataset.val;
+  const is36    = (liv !== '6°');
+
+  const p1 = (parseFloat(document.getElementById('perc1').value) || 80) / 100;
+  const p2 = (parseFloat(document.getElementById('perc2').value) || 85) / 100;
+  const p3 = (parseFloat(document.getElementById('perc3').value) || 90) / 100;
+
+  const coniuge = document.getElementById('chkConiuge').checked;
+  const a100 = parseInt(document.getElementById('asc100').value) || 0;
+  const a50  = parseInt(document.getElementById('asc50').value)  || 0;
+  const f100 = parseInt(document.getElementById('fig100').value) || 0;
+  const f50  = parseInt(document.getElementById('fig50').value)  || 0;
+
+  const args = [terr, liv, oreW, prop, 0, supM, conMensa, true, categ, coniuge, a100, a50, f100, f50];
+
+  // Costruisce fasi
+  const phases = [
+    { key:'a1', cls:'ph-a1', bar:'tl-a1', name:'Anno 1',           sub:`${pct(p1)} tabellare · contributi apprendista`,  perc:p1,  isAppr:true },
+    { key:'a2', cls:'ph-a2', bar:'tl-a2', name:'Anno 2',           sub:`${pct(p2)} tabellare · contributi apprendista`,  perc:p2,  isAppr:true },
+    ...(is36 ? [{ key:'a3', cls:'ph-a3', bar:'tl-a3', name:'Anno 3', sub:`${pct(p3)} tabellare · contributi apprendista`, perc:p3, isAppr:true }] : []),
+    { key:'aq', cls:'ph-aq', bar:'tl-aq', name:'Anno qualifica',   sub:`100% tabellare · contributi apprendista`,         perc:1.0, isAppr:true },
+    { key:'an', cls:'ph-an', bar:'tl-an', name:'Contratto normale', sub:`100% tabellare · contributi ordinari`,            perc:1.0, isAppr:false }
+  ];
+
+  const results = phases.map(ph => ({
+    ...ph,
+    r: calcFase(terr, liv, oreW, prop, ph.perc, supM, conMensa, ph.isAppr, categ, coniuge, a100, a50, f100, f50)
+  }));
+
+  renderResults(results, is36, liv, categ);
+}
+
+// ===== RENDER =====
+function renderResults(results, is36, liv, categ) {
+  document.getElementById('placeholder').style.display = 'none';
+  const rb = document.getElementById('resultBlock');
+  rb.classList.add('visible');
+
+  // Su mobile: collassa input e mostra hint dopo il primo calcolo
+  if (window.innerWidth <= 680) {
+    const card = document.getElementById('inputCard');
+    const icon = document.getElementById('mobIcon');
+    if (card.classList.contains('mob-open')) {
+      card.classList.remove('mob-open');
+      icon.classList.remove('open');
+    }
+    showScrollHint();
+  }
+
+  const livLabels = {"4°":"4° Livello","5°":"5° Livello","6/S":"6° Super","6°":"6° Livello"};
+  const durLabel  = is36 ? "36 mesi + anno qualifica" : "24 mesi + anno qualifica";
+  document.getElementById('tlTitle').textContent = `Progressione — ${livLabels[liv]} · ${categ.charAt(0).toUpperCase()+categ.slice(1)}`;
+  document.getElementById('tlBadge').textContent = durLabel;
+
+  // Barra timeline
+  document.getElementById('tlBar').innerHTML = results.map(ph =>
+    `<div class="tl-seg ${ph.bar}" title="${ph.name}"></div>`
+  ).join('');
+
+  // Griglia fasi
+  const grid = document.getElementById('phasesGrid');
+  grid.className = `phases-grid phases-${results.length}`;
+
+  const inailLabel = categ === 'operaio' ? 'INAIL op. (11.01‰)' : 'INAIL imp. (6.26‰)';
+  const cs = costsVisible ? 'on' : '';
+  const oreInt = liv === '6°' ? 40 : 60;
+
+  function formLabel(phName) {
+    if (phName === 'Anno 1')
+      return `<div class="form-info">📚 Formazione: ${oreInt}h interna + 40h esterna (trasversale)</div>`;
+    if (phName === 'Anno 2' || phName === 'Anno 3')
+      return `<div class="form-info">📚 Formazione: ${oreInt}h interna</div>`;
+    return '';
+  }
+
+  grid.innerHTML = results.map(ph => {
+    const r = ph.r;
+    const normNote = !ph.isAppr ? `<div class="cost-note">* INPS az. ${(parseFloat(document.getElementById('inpsAzNorm').value)||29.5).toFixed(2)}% (valore configurabile)</div>` : '';
+    const inpsRate = ph.isAppr ? INPS_APPR : 0.100567;
+    const inpsRateLbl = (inpsRate * 100).toFixed(4).replace('.',',') + '%';
+    return `
+<div class="phase-card ${ph.cls}">
+  <div class="ph-head">
+    <div class="ph-name">${ph.name}</div>
+    <div class="ph-sub">${ph.sub}</div>
+  </div>
+  <div class="ph-body">
+    <div class="netto-lbl">Netto mensile (su 14)</div>
+    <div class="netto-val">${fmt(r.nettoM)}</div>
+
+    <div class="row"><span class="row-lbl">Lordo mensile</span><span class="row-val">${fmt(r.lM)}</span></div>
+    <div class="row"><span class="row-lbl">Lordo annuo</span><span class="row-val">${fmt(r.lA)}</span></div>
+    <div class="row"><span class="row-lbl">Netto annuo</span><span class="row-val">${fmt(r.nettoA)}</span></div>
+
+    ${r.drA > 0 ? '<div class="dr">✓ Detassazione 5% rinnovo CCNL</div>' : ''}
+    ${r.TI   > 0 ? '<div class="dr" style="color:#0284C7">✓ Trattamento Integrativo 1.200 €</div>' : ''}
+    ${formLabel(ph.name)}
+
+    <div class="cost-sec ${cs}">
+      <hr class="divider">
+      <div class="row"><span class="row-lbl">INPS dip. (${inpsRateLbl})</span><span class="row-val">${fmt(r.contributiDip)}</span></div>
+      <div class="row"><span class="row-lbl">INPS az.</span><span class="row-val">${fmt(r.inpsAz)}</span></div>
+      <div class="row"><span class="row-lbl">${inailLabel}</span><span class="row-val">${fmt(r.inailAz)}</span></div>
+      <div class="row"><span class="row-lbl">TFR (accantonamento)</span><span class="row-val">${fmt(r.tfr)}</span></div>
+      <div class="row"><span class="row-lbl">EB + COVELCO az. (0,50%)</span><span class="row-val">${fmt(r.entiAzA)}</span></div>
+      <div class="row"><span class="row-lbl">Fondo EST az. (12 €/mese)</span><span class="row-val">${fmt(r.fondoEstAz)}</span></div>
+      <div class="costo-total">
+        <div class="cost-total-lbl">Costo azienda annuo</div>
+        <div class="cost-total-val">${fmt(r.costoAz)}</div>
+        <div class="cost-total-sub">mensile: ${fmt(r.costoAz/12)}</div>
+      </div>
+      ${normNote}
+    </div>
+  </div>
+</div>`;
+  }).join('');
+}
+
+// ===== TOGGLE COSTI =====
+function toggleCosts() {
+  costsVisible = !costsVisible;
+  const btn = document.getElementById('btnCosts');
+  btn.textContent = costsVisible ? '📊 Nascondi costo azienda' : '📊 Mostra costo azienda';
+  btn.classList.toggle('active', costsVisible);
+  document.getElementById('inpsNormField').style.display = costsVisible ? '' : 'none';
+  document.querySelectorAll('.cost-sec').forEach(el => el.classList.toggle('on', costsVisible));
+}
+
+// ===== MOBILE INPUT TOGGLE =====
+function toggleMobInput() {
+  const card = document.getElementById('inputCard');
+  const icon = document.getElementById('mobIcon');
+  const open = card.classList.toggle('mob-open');
+  icon.classList.toggle('open', open);
+}
+
+// Su mobile: mostra scroll hint dopo calcolo
+function showScrollHint() {
+  const hint = document.getElementById('scrollHint');
+  if (hint) hint.style.display = window.innerWidth <= 680 ? 'block' : 'none';
+}
+
+// ===== FAMILIARI TOGGLE =====
+function toggleFam() {
+  const body = document.getElementById('famBody');
+  const icon = document.getElementById('famIcon');
+  const open = body.classList.toggle('open');
+  icon.classList.toggle('open', open);
+}
+
+// ===== CATEGORIA TOGGLE =====
+document.getElementById('catToggle').addEventListener('click', e => {
+  const btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  aggiorna();
+});
+
+// ===== PLACEHOLDER =====
+function showPH() {
+  document.getElementById('placeholder').style.display = 'block';
+  document.getElementById('resultBlock').classList.remove('visible');
+}
+
+// ===== INIT =====
+onLivChange();
+
+// Su mobile apre l'input panel all'avvio
+if (window.innerWidth <= 680) {
+  document.getElementById('inputCard').classList.add('mob-open');
+  document.getElementById('mobIcon').classList.add('open');
+}
+</script>
+</body>
+</html>
