@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#C0392B"/>
+  <rect x="60" y="60" width="392" height="392" rx="50" fill="#922B21"/>
+  <text x="256" y="210" font-family="Arial,sans-serif" font-size="150" font-weight="bold" fill="white" text-anchor="middle">HR</text>
+  <text x="256" y="340" font-family="Arial,sans-serif" font-size="56" font-weight="700" letter-spacing="4" fill="rgba(255,255,255,0.90)" text-anchor="middle">ESSENTIAL</text>
+</svg>
