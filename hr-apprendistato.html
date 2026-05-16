@@ -691,10 +691,10 @@ const REG = {
 };
 
 // ===== COSTANTI CONTRIBUTIVE =====
-// Dipendente apprendista: IVS 5.84% + 0.30% + 0.2667% + COVELCO 0.10% + EB 0.20%
-const INPS_APPR = 0.0584 + 0.003 + 0.002667 + 0.001 + 0.002; // 0.066967
-// Dipendente ordinario
-const INPS_NORM = 0.097567 + 0.001 + 0.002;                  // 0.100567
+// Dipendente apprendista: IVS 5.84% + CIGS 0.30% + FIS 0.2667% (solo contributi legalmente deducibili)
+const INPS_APPR = 0.0584 + 0.003 + 0.002667; // 0.063967
+// Dipendente ordinario: IVS 9.7567% (solo contributi legalmente deducibili)
+const INPS_NORM = 0.097567;                   // Covelco 0.1% + EB_dip 0.2% calcolati separatamente
 // Datore apprendista
 const INPS_AZ_APPR = 0.124633;
 // INAIL: tasso base × 1.01 (maggiorazione 1%)
@@ -727,13 +727,22 @@ function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, co
   // EB principale 0.40% AZ + COVELCO 0.10% AZ = 0.50% totale
   const entiAzA = bc * prop * 14 * 0.005;
 
-  const INPSdip     = isAppr ? INPS_APPR : INPS_NORM;
+  const INPSdip       = isAppr ? INPS_APPR : INPS_NORM;
   const contributiDip = lA * INPSdip;
+  // Contributi contrattuali (CCNL) — non deducibili dall'imponibile fiscale, sottratti solo dal netto
+  const covelcoA = lA * 0.001;
+  const ebDipA   = bc * prop * 14 * 0.002;
 
   // Imponibile fiscale
-  const impFiscLordo = lA - contributiDip + entiAzA;
-  const impOrd       = impFiscLordo - drA;
-  const impSost5     = drA * (1 - INPSdip) * 0.05;  // 5% su quota netta INPS
+  const impFiscLordo = lA - contributiDip + covelcoA + ebDipA + entiAzA;
+  const impOrd       = impFiscLordo - drA * (1 - INPSdip);   // quota 5% esce per il netto INPS
+  const impSost5     = drA * (1 - INPSdip) * 0.05;
+
+  // Somma che non concorre al reddito (LdB 2025, art. 1 L.207/2024 — cuneo fiscale basso)
+  const sommaNonConcorre = impOrd <= 0      ? 0 :
+                           impOrd <= 8500   ? impOrd * 0.071 :
+                           impOrd <= 15000  ? impOrd * 0.053 :
+                           impOrd <= 20000  ? impOrd * 0.048 : 0;
 
   // IRPEF lorda 2026
   let irpefL = 0;
@@ -799,12 +808,12 @@ function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, co
   // Addizionale comunale
   const ec = td.ec, ac = td.ac;
   let addCom = 0;
-  const baseCom = Math.max(0, impOrd-ec);
-  if (baseCom > 0) {
-    const c1 = Math.min(baseCom, Math.max(0,15000-ec));
-    const c2 = Math.max(0, Math.min(baseCom,Math.max(0,28000-ec)) - Math.max(0,15000-ec));
-    const c3 = Math.max(0, Math.min(baseCom,Math.max(0,50000-ec)) - Math.max(0,28000-ec));
-    const c4 = Math.max(0, baseCom-Math.max(0,50000-ec));
+  if (impOrd > ec) {
+    // Franchigia piena: se superi la soglia paghi sull'intero imponibile (non solo sull'eccedenza)
+    const c1 = Math.min(impOrd, 15000);
+    const c2 = Math.max(0, Math.min(impOrd,28000)-15000);
+    const c3 = Math.max(0, Math.min(impOrd,50000)-28000);
+    const c4 = Math.max(0, impOrd-50000);
     addCom = c1*ac[0] + c2*ac[1] + c3*ac[2] + c4*ac[3];
   }
 
@@ -812,7 +821,7 @@ function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, co
   const tarifaMensa = oreW <= 15 ? 1.45 : 1.65;
   const mensaAnnua  = conMensa ? tarifaMensa*20*11 : 0;
 
-  const nettoA = lA - contributiDip - irpefN - addReg - addCom - impSost5 + TI - mensaAnnua;
+  const nettoA = lA - contributiDip - covelcoA - ebDipA - irpefN - addReg - addCom - impSost5 + TI + sommaNonConcorre - mensaAnnua;
   const nettoM = nettoA / 14;
 
   // Costo azienda
@@ -929,7 +938,7 @@ function renderResults(results, is36, liv, categ) {
   grid.innerHTML = results.map(ph => {
     const r = ph.r;
     const normNote = !ph.isAppr ? `<div class="cost-note">* INPS az. ${(parseFloat(document.getElementById('inpsAzNorm').value)||29.5).toFixed(2)}% (valore configurabile)</div>` : '';
-    const inpsRate = ph.isAppr ? INPS_APPR : 0.100567;
+    const inpsRate = ph.isAppr ? INPS_APPR : INPS_NORM;
     const inpsRateLbl = (inpsRate * 100).toFixed(4).replace('.',',') + '%';
     return `
 <div class="phase-card ${ph.cls}">

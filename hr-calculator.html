@@ -558,7 +558,7 @@ const REG  = {"Abruzzo": [0.0167, 0.0167, 0.0287, 0.0333], "Basilicata": [0.0123
 // Paga base + contingenza per livello (base enti bilaterali, identica per tutti i territori)
 const BC = {"1°":2053.87,"2°":1868.92,"3°":1757.14,"4°":1652.69,"5°":1543.86,"6/S":1480.77,"6°":1458.31,"7°":1360.34,"quadro A":2397.19,"quadro B":2212.22};
 
-const INPS = 0.097567 + 0.001 + 0.002;   // 0.100567
+const INPS = 0.097567;   // IVS + CIGS + FIS (solo contributi legalmente deducibili)
 
 // ===== UTILS =====
 const fmt = (n) => new Intl.NumberFormat("it-IT", {minimumFractionDigits:2, maximumFractionDigits:2}).format(n) + " €";
@@ -578,13 +578,23 @@ function calcola(terr, liv, oreW, oreFT, conMensa, festivi, coniuge, asc100, asc
   const festiviAnnui = (lM / 26) * festivi;
   const lAnnuo       = lA + festiviAnnui;
 
-  // Enti bilaterali azienda (0,20% su paga base+contingenza, confluisce in imponibile fiscale)
-  const entiAziendaA = (BC[liv] || 0) * prop * 14 * 0.002;
+  // Contributi contrattuali (CCNL) — non deducibili dall'imponibile fiscale, sottratti solo dal netto
+  const covelcoA    = lAnnuo * 0.001;
+  const ebDipA      = (BC[liv] || 0) * prop * 14 * 0.002;
+  const entiAziendaA = (BC[liv] || 0) * prop * 14 * 0.002;   // quota azienda EB: benefit fiscale
 
   const contributiDip = lAnnuo * INPS;
-  const impFiscLordo  = lAnnuo - contributiDip + entiAziendaA;
-  const impOrd        = impFiscLordo - drA;
-  const impSost5      = drA * (1 - INPS) * 0.05;   // imposta sostitutiva su quota netta INPS
+  // Covelco e EB_dip non si deducono dall'imponibile (contratto CCNL, non obbligo di legge)
+  // EB azienda si aggiunge come benefit; Covelco e EB_dip restano nel lordo
+  const impFiscLordo  = lAnnuo - contributiDip + covelcoA + ebDipA + entiAziendaA;
+  const impOrd        = impFiscLordo - drA * (1 - INPS);   // la quota 5% esce per il netto INPS, non il lordo
+  const impSost5      = drA * (1 - INPS) * 0.05;
+
+  // Somma che non concorre al reddito (LdB 2025, art. 1 L.207/2024 — cuneo fiscale basso)
+  const sommaNonConcorre = impOrd <= 0      ? 0 :
+                           impOrd <= 8500   ? impOrd * 0.071 :
+                           impOrd <= 15000  ? impOrd * 0.053 :
+                           impOrd <= 20000  ? impOrd * 0.048 : 0;
 
   // IRPEF lorda
   let irpefL = 0;
@@ -657,12 +667,12 @@ function calcola(terr, liv, oreW, oreFT, conMensa, festivi, coniuge, asc100, asc
   const ec = td.ec;
   const ac = td.ac;
   let addCom = 0;
-  const baseCom = Math.max(0, impOrd - ec);
-  if (baseCom > 0) {
-    const c1 = Math.min(baseCom, Math.max(0, 15000 - ec));
-    const c2 = Math.max(0, Math.min(baseCom, Math.max(0, 28000 - ec)) - Math.max(0, 15000 - ec));
-    const c3 = Math.max(0, Math.min(baseCom, Math.max(0, 50000 - ec)) - Math.max(0, 28000 - ec));
-    const c4 = Math.max(0, baseCom - Math.max(0, 50000 - ec));
+  if (impOrd > ec) {
+    // Franchigia piena: se superi la soglia paghi sull'intero imponibile (non solo sull'eccedenza)
+    const c1 = Math.min(impOrd, 15000);
+    const c2 = Math.max(0, Math.min(impOrd, 28000) - 15000);
+    const c3 = Math.max(0, Math.min(impOrd, 50000) - 28000);
+    const c4 = Math.max(0, impOrd - 50000);
     addCom = c1*ac[0] + c2*ac[1] + c3*ac[2] + c4*ac[3];
   }
 
@@ -670,7 +680,7 @@ function calcola(terr, liv, oreW, oreFT, conMensa, festivi, coniuge, asc100, asc
   const tarifaMensa = oreW <= 15 ? 1.45 : 1.65;
   const mensaAnnua  = conMensa ? tarifaMensa * 20 * 11 : 0;
 
-  const nettoA = lAnnuo - contributiDip - irpefN - addReg - addCom - impSost5 + TI - mensaAnnua;
+  const nettoA = lAnnuo - contributiDip - covelcoA - ebDipA - irpefN - addReg - addCom - impSost5 + TI + sommaNonConcorre - mensaAnnua;
   const nettoM = nettoA / 14;
 
   return {
