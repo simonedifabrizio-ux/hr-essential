@@ -578,15 +578,14 @@ function calcola(terr, liv, oreW, oreFT, conMensa, festivi, coniuge, asc100, asc
   const festiviAnnui = (lM / 26) * festivi;
   const lAnnuo       = lA + festiviAnnui;
 
-  // Contributi contrattuali (CCNL) — non deducibili dall'imponibile fiscale, sottratti solo dal netto
+  // Contributi contrattuali (CCNL): Covelco/EB dipendente riducono solo il netto.
+  // Solo EB azienda aumenta l'imponibile fiscale come benefit.
   const covelcoA    = lAnnuo * 0.001;
   const ebDipA      = (BC[liv] || 0) * prop * 14 * 0.002;
   const entiAziendaA = (BC[liv] || 0) * prop * 14 * 0.002;   // quota azienda EB: benefit fiscale
 
   const contributiDip = lAnnuo * INPS;
-  // Covelco e EB_dip non si deducono dall'imponibile (contratto CCNL, non obbligo di legge)
-  // EB azienda si aggiunge come benefit; Covelco e EB_dip restano nel lordo
-  const impFiscLordo  = lAnnuo - contributiDip + covelcoA + ebDipA + entiAziendaA;
+  const impFiscLordo  = lAnnuo - contributiDip + entiAziendaA;
   const impOrd        = impFiscLordo - drA * (1 - INPS);   // la quota 5% esce per il netto INPS, non il lordo
   const impSost5      = drA * (1 - INPS) * 0.05;
 
