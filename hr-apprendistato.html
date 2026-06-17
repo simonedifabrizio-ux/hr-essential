@@ -723,9 +723,9 @@ function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, co
   // Delta rinnovo (proporzionale alla % apprendistato, non al superminimo)
   const drA = dr * prop * perc * 14;
 
-  // Enti bilaterali + COVELCO azienda (su BC nazionale, benefit per dipendente)
-  // EB principale 0.40% AZ + COVELCO 0.10% AZ = 0.50% totale
-  const entiAzA = bc * prop * 14 * 0.005;
+  // Ente bilaterale azienda (su BC nazionale): benefit fiscalmente imponibile.
+  // Covelco azienda e quote dipendente non aumentano/riducono l'imponibile fiscale.
+  const entiAzA = bc * prop * 14 * 0.004;
 
   const INPSdip       = isAppr ? INPS_APPR : INPS_NORM;
   const contributiDip = lA * INPSdip;
@@ -734,7 +734,7 @@ function calcFase(terr, liv, oreW, prop, perc, supM, conMensa, isAppr, categ, co
   const ebDipA   = bc * prop * 14 * 0.002;
 
   // Imponibile fiscale
-  const impFiscLordo = lA - contributiDip + covelcoA + ebDipA + entiAzA;
+  const impFiscLordo = lA - contributiDip + entiAzA;
   const impOrd       = impFiscLordo - drA * (1 - INPSdip);   // quota 5% esce per il netto INPS
   const impSost5     = drA * (1 - INPSdip) * 0.05;
 
@@ -964,7 +964,7 @@ function renderResults(results, is36, liv, categ) {
       <div class="row"><span class="row-lbl">INPS az.</span><span class="row-val">${fmt(r.inpsAz)}</span></div>
       <div class="row"><span class="row-lbl">${inailLabel}</span><span class="row-val">${fmt(r.inailAz)}</span></div>
       <div class="row"><span class="row-lbl">TFR (accantonamento)</span><span class="row-val">${fmt(r.tfr)}</span></div>
-      <div class="row"><span class="row-lbl">EB + COVELCO az. (0,50%)</span><span class="row-val">${fmt(r.entiAzA)}</span></div>
+      <div class="row"><span class="row-lbl">EB az. benefit (0,40%)</span><span class="row-val">${fmt(r.entiAzA)}</span></div>
       <div class="row"><span class="row-lbl">Fondo EST az. (12 €/mese)</span><span class="row-val">${fmt(r.fondoEstAz)}</span></div>
       <div class="costo-total">
         <div class="cost-total-lbl">Costo azienda annuo</div>
