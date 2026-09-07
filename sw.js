@@ -1,4 +1,4 @@
-const CACHE = 'hr-essential-v4';
+const CACHE = 'hr-essential-v5-20260901';
 const FILES = [
   '/hr-essential/',
   '/hr-essential/index.html',
