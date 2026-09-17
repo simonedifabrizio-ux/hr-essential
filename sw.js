@@ -1,9 +1,10 @@
-const CACHE = 'hr-essential-v5-20260901';
+const CACHE = 'hr-essential-v6-20260917';
 const FILES = [
   '/hr-essential/',
   '/hr-essential/index.html',
   '/hr-essential/hr-calculator.html',
   '/hr-essential/hr-apprendistato.html',
+  '/hr-essential/Retribuzioni%20Utility.html',
   '/hr-essential/manifest.json',
   '/hr-essential/icon.svg'
 ];
