@@ -11,7 +11,24 @@
 <title>HR Essential — Strumenti HR</title>
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/hr-essential/sw.js');
+  let reloading = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloading) return;
+    reloading = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.register('/hr-essential/sw.js', { updateViaCache: 'none' })
+    .then(registration => {
+      registration.update();
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') registration.update();
+      });
+
+      window.setInterval(() => registration.update(), 60 * 60 * 1000);
+    });
 }
 </script>
 <style>
